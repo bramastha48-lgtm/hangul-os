@@ -1,0 +1,1884 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>한글_OS — Belajar Bahasa Korea dari Nol</title>
+
+<meta name="description" content="App interaktif untuk belajar bahasa Korea dari dasar: alfabet, suku kata, kosakata, translate, dan kuis bertingkat.">
+<meta name="theme-color" content="#34D399">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="한글_OS">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="icons/icon-192.svg">
+<link rel="apple-touch-icon" href="icons/icon-192.svg">
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+<style>
+/* ========== RESET & BASE ========== */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#09090b;--bg2:#0f0f12;--card:#111113;--card-hover:#18181b;
+  --emerald:#34D399;--emerald-dim:rgba(52,211,153,0.08);--emerald-glow:0 0 20px rgba(52,211,153,0.2);
+  --amber:#FBBF24;--amber-dim:rgba(251,191,36,0.08);
+  --rose:#FB7185;--rose-dim:rgba(251,113,133,0.08);
+  --sky:#38BDF8;--sky-dim:rgba(56,189,248,0.08);
+  --violet:#A78BFA;--violet-dim:rgba(167,139,250,0.08);
+  --text:#FAFAFA;--text-dim:#71717A;--text-sub:#52525B;
+  --border:#1e1e22;--border-light:#27272a;
+  --radius:14px;--radius-sm:10px;--radius-xs:8px;
+  --sidebar-w:240px;
+  --font:'DM Sans','Noto Sans KR',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{font-family:var(--font);cursor:pointer}
+input,textarea{font-family:var(--font)}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::selection{background:rgba(52,211,153,0.25)}
+
+/* ========== LAYOUT ========== */
+.app{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{
+  width:var(--sidebar-w);background:var(--card);border-right:1px solid var(--border);
+  position:fixed;top:0;left:0;bottom:0;z-index:100;
+  display:flex;flex-direction:column;
+  transition:transform 0.3s;
+}
+.sidebar-header{
+  padding:1.5rem 1.25rem 1rem;border-bottom:1px solid var(--border);
+}
+.sidebar-logo{font-size:1.15rem;font-weight:700;display:flex;align-items:center;gap:0.5rem}
+.sidebar-logo .dot{width:8px;height:8px;border-radius:50%;background:var(--emerald);box-shadow:var(--emerald-glow)}
+.sidebar-logo .name{letter-spacing:-0.5px}
+.sidebar-logo .sub{font-size:0.6rem;color:var(--text-sub);margin-top:0.15rem;display:block;letter-spacing:1px;text-transform:uppercase}
+
+.sidebar-nav{flex:1;overflow-y:auto;padding:0.75rem 0.75rem}
+.nav-group{margin-bottom:1.25rem}
+.nav-group-label{
+  font-size:0.55rem;text-transform:uppercase;letter-spacing:2px;
+  color:var(--text-sub);padding:0.3rem 0.75rem;margin-bottom:0.2rem;font-weight:600;
+}
+.nav-item{
+  display:flex;align-items:center;gap:0.65rem;
+  padding:0.6rem 0.75rem;border-radius:var(--radius-xs);
+  font-size:0.85rem;font-weight:500;color:var(--text-dim);
+  transition:all 0.2s;cursor:pointer;border:none;background:none;width:100%;text-align:left;
+}
+.nav-item:hover{background:var(--emerald-dim);color:var(--text)}
+.nav-item.active{background:var(--emerald-dim);color:var(--emerald);font-weight:600}
+.nav-item .icon{font-size:1rem;width:20px;text-align:center}
+.nav-item .label{flex:1}
+.nav-item .badge{
+  font-size:0.55rem;font-weight:700;padding:0.1rem 0.4rem;
+  border-radius:100px;background:var(--emerald-dim);color:var(--emerald);
+}
+
+.sidebar-footer{
+  padding:1rem 1.25rem;border-top:1px solid var(--border);
+  font-size:0.7rem;color:var(--text-sub);
+}
+
+/* MAIN CONTENT */
+.main{margin-left:var(--sidebar-w);flex:1;min-height:100vh}
+.main-inner{max-width:900px;margin:0 auto;padding:2.5rem 2.5rem 6rem}
+
+/* PAGE */
+.page{display:none}
+.page.active{display:block;animation:fadeIn 0.3s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* HEADINGS */
+.page-label{font-size:0.6rem;text-transform:uppercase;letter-spacing:3px;color:var(--text-sub);margin-bottom:0.75rem;font-weight:600}
+h1{font-size:2.4rem;font-weight:700;line-height:1.15;margin-bottom:0.75rem;letter-spacing:-1px}
+h1 .em{color:var(--emerald)}
+h2{font-size:1.35rem;font-weight:700;margin-bottom:0.5rem}
+h3{font-size:1.05rem;font-weight:600;margin-bottom:0.4rem}
+.subtitle{color:var(--text-dim);font-size:0.95rem;line-height:1.7;max-width:560px;margin-bottom:2rem}
+
+/* CARDS */
+.card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:1.75rem;margin-bottom:1.25rem;
+  transition:border-color 0.2s;
+}
+.card:hover{border-color:var(--border-light)}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem}
+.card-title{font-size:1rem;font-weight:600;display:flex;align-items:center;gap:0.5rem}
+.card-badge{
+  font-size:0.55rem;font-weight:700;padding:0.2rem 0.6rem;
+  border-radius:100px;letter-spacing:1px;background:var(--emerald-dim);color:var(--emerald);
+}
+
+/* LEGEND */
+.legend{display:flex;gap:1.25rem;margin-bottom:1.25rem;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:0.4rem;font-size:0.75rem;color:var(--text-dim)}
+.legend-dot{width:8px;height:8px;border-radius:2px}
+.legend-dot.c{background:var(--emerald)}
+.legend-dot.v{background:var(--amber)}
+.legend-dot.d{background:var(--rose)}
+.legend-dot.cv{background:var(--sky)}
+
+/* SEARCH */
+.search-bar{
+  display:flex;align-items:center;gap:0.75rem;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:0.85rem 1.25rem;
+  margin-bottom:1.5rem;transition:border-color 0.3s;max-width:560px;
+}
+.search-bar:focus-within{border-color:var(--emerald)}
+.search-bar .icon{color:var(--text-sub);font-size:1rem}
+.search-bar input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:0.9rem}
+.search-bar input::placeholder{color:var(--text-sub)}
+
+/* ALPHABET GRID */
+.alpha-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:0.5rem}
+.alpha-cell{
+  background:transparent;border:1px solid var(--border);
+  border-radius:var(--radius-xs);padding:0.85rem 0.4rem 0.7rem;
+  text-align:center;cursor:pointer;transition:all 0.2s;
+}
+.alpha-cell:hover{background:var(--card);border-color:var(--emerald);transform:translateY(-1px)}
+.alpha-cell .kr{font-family:'Noto Sans KR',sans-serif;font-size:1.9rem;font-weight:500;display:block;line-height:1.2;margin-bottom:0.25rem}
+.alpha-cell .roman{font-size:0.82rem;font-weight:700;letter-spacing:0.5px}
+.alpha-cell.consonant .roman{color:var(--emerald)}
+.alpha-cell.vowel .roman{color:var(--amber)}
+.alpha-cell.double .roman{color:var(--rose)}
+.alpha-cell.combo .roman{color:var(--sky)}
+
+/* SECTION LABEL */
+.section-label{font-size:0.6rem;text-transform:uppercase;letter-spacing:3px;color:var(--text-sub);margin-bottom:1rem;margin-top:2.5rem;font-weight:600}
+
+/* DETAIL PANEL */
+.detail-panel{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:2rem;margin-top:1rem;display:none;position:relative;
+}
+.detail-panel.active{display:block;animation:fadeIn 0.3s}
+.detail-close{
+  position:absolute;top:1rem;right:1rem;background:none;border:1px solid var(--border);
+  color:var(--text-dim);width:28px;height:28px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;font-size:0.85rem;transition:all 0.2s;
+}
+.detail-close:hover{border-color:var(--text-dim);color:var(--text)}
+.detail-header{display:flex;align-items:center;gap:2rem;margin-bottom:1.5rem}
+.detail-char{font-family:'Noto Sans KR',sans-serif;font-size:4.5rem;font-weight:500;line-height:1}
+.detail-char.c{color:var(--emerald)}.detail-char.v{color:var(--amber)}.detail-char.d{color:var(--rose)}.detail-char.cv{color:var(--sky)}
+.detail-info .row{display:flex;gap:1.5rem;margin-bottom:0.4rem;font-size:0.85rem}
+.detail-info .label{color:var(--text-dim);min-width:90px}.detail-info .value{font-weight:600}
+.detail-examples{margin-top:1rem}
+.detail-examples h4{font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-sub);margin-bottom:0.75rem}
+.example-word{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  background:var(--bg2);border:1px solid var(--border);border-radius:8px;
+  padding:0.5rem 0.85rem;margin:0 0.5rem 0.5rem 0;font-size:0.82rem;
+}
+.example-word .kr{font-family:'Noto Sans KR',sans-serif;font-size:1.2rem;font-weight:500}
+.example-word .meaning{color:var(--text-dim);font-size:0.75rem}
+
+/* RESULT CARD */
+.result-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:2rem;display:flex;gap:2.5rem;align-items:center;
+}
+.result-kr{font-family:'Noto Sans KR',sans-serif;font-size:4.5rem;font-weight:700;line-height:1}
+.result-info{flex:1}
+.result-info .row{display:flex;gap:1.5rem;margin-bottom:0.4rem;font-size:0.85rem}
+.result-info .label{color:var(--text-sub);min-width:80px;font-size:0.75rem}
+.result-info .value{font-weight:600}.result-info .value.roman{color:var(--amber)}
+.result-breakdown{display:flex;gap:0.6rem;margin-top:1rem;flex-wrap:wrap}
+.bd-item{
+  display:flex;flex-direction:column;align-items:center;
+  border:1px solid var(--border);border-radius:8px;padding:0.5rem 0.65rem;min-width:50px;
+}
+.bd-item .bd-char{font-family:'Noto Sans KR',sans-serif;font-size:1.2rem;font-weight:500}
+.bd-item .bd-label{font-size:0.5rem;text-transform:uppercase;letter-spacing:1px;margin-top:0.1rem}
+.bd-item.init .bd-char{color:var(--emerald)}.bd-item.init .bd-label{color:var(--emerald);opacity:.5}
+.bd-item.med .bd-char{color:var(--amber)}.bd-item.med .bd-label{color:var(--amber);opacity:.5}
+.bd-item.fin .bd-char{color:var(--rose)}.bd-item.fin .bd-label{color:var(--rose);opacity:.5}
+.bd-plus{display:flex;align-items:center;color:var(--text-sub);font-size:0.85rem}
+.bd-arrow{display:flex;align-items:center;color:var(--text-sub);font-size:0.85rem;margin:0 0.2rem}
+
+/* SYLLABLE BUILDER */
+.builder-area{display:flex;gap:2rem;align-items:flex-start;flex-wrap:wrap}
+.builder-slots{display:flex;flex-direction:column;align-items:center;gap:0.5rem}
+.builder-preview{
+  width:120px;height:120px;border:2px dashed var(--border);border-radius:var(--radius);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Noto Sans KR',sans-serif;font-size:3.5rem;font-weight:500;
+  color:var(--emerald);transition:all 0.3s;background:var(--bg2);
+}
+.builder-preview.has-value{border-style:solid;border-color:var(--emerald);box-shadow:var(--emerald-glow)}
+.slot-row{display:flex;gap:0.75rem;align-items:center}
+.slot{
+  width:70px;height:70px;border:2px dashed var(--border);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Noto Sans KR',sans-serif;font-size:1.8rem;font-weight:500;
+  cursor:pointer;transition:all 0.25s;background:var(--bg2);position:relative;
+}
+.slot.active{border-color:var(--emerald);border-style:solid;box-shadow:var(--emerald-glow)}
+.slot.filled{border-color:var(--emerald);border-style:solid;background:var(--emerald-dim);color:var(--emerald)}
+.slot.filled.vowel-slot{border-color:var(--amber);background:var(--amber-dim);color:var(--amber)}
+.slot-label{font-size:0.5rem;color:var(--text-sub);text-transform:uppercase;letter-spacing:1px;position:absolute;bottom:-16px}
+.builder-picker{flex:1;min-width:280px}
+.picker-title{font-size:0.7rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-sub);margin-bottom:0.75rem}
+.picker-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:0.4rem}
+.picker-cell{
+  background:var(--bg2);border:1px solid var(--border);border-radius:6px;
+  padding:0.6rem 0.3rem;text-align:center;cursor:pointer;transition:all 0.2s;
+  font-family:'Noto Sans KR',sans-serif;font-size:1.3rem;font-weight:500;
+}
+.picker-cell:hover{border-color:var(--emerald);background:var(--emerald-dim);transform:scale(1.1)}
+.picker-cell.vowel-pick:hover{border-color:var(--amber);background:var(--amber-dim)}
+.picker-cell.selected{border-color:var(--emerald);background:var(--emerald-dim);box-shadow:var(--emerald-glow)}
+.picker-cell.vowel-pick.selected{border-color:var(--amber);background:var(--amber-dim)}
+
+/* WORD BREAKDOWN */
+.word-selector{display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.5rem}
+.word-btn{
+  background:var(--bg2);border:1px solid var(--border);border-radius:8px;
+  padding:0.55rem 1rem;cursor:pointer;transition:all 0.2s;
+  font-family:'Noto Sans KR',sans-serif;font-size:0.95rem;font-weight:500;color:var(--text);
+}
+.word-btn:hover{border-color:var(--emerald);background:var(--emerald-dim)}
+.word-btn.active{border-color:var(--emerald);background:var(--emerald-dim);color:var(--emerald)}
+.word-display{text-align:center;margin-bottom:2rem}
+.word-display .big-word{font-family:'Noto Sans KR',sans-serif;font-size:3.5rem;font-weight:500;color:var(--emerald);letter-spacing:0.5rem;margin-bottom:0.3rem}
+.word-display .word-meaning{font-size:1rem;color:var(--text-dim)}
+.word-display .word-roman{font-size:0.85rem;color:var(--amber);margin-top:0.2rem}
+.syllable-breakdown{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.syl-block{display:flex;flex-direction:column;align-items:center;gap:0.5rem;animation:fadeIn 0.4s ease-out backwards}
+.syl-block:nth-child(1){animation-delay:.05s}.syl-block:nth-child(3){animation-delay:.1s}.syl-block:nth-child(5){animation-delay:.15s}.syl-block:nth-child(7){animation-delay:.2s}
+.syl-char{font-family:'Noto Sans KR',sans-serif;font-size:2.8rem;font-weight:500;line-height:1}
+.syl-parts{display:flex;gap:0.2rem;align-items:center}
+.syl-part{display:flex;flex-direction:column;align-items:center;padding:0.35rem 0.5rem;border-radius:6px;min-width:40px}
+.syl-part .part-char{font-family:'Noto Sans KR',sans-serif;font-size:1.3rem;font-weight:500;line-height:1.2}
+.syl-part .part-label{font-size:0.5rem;text-transform:uppercase;letter-spacing:1px;margin-top:0.15rem}
+.syl-part.initial{background:var(--emerald-dim);border:1px solid rgba(52,211,153,0.15)}
+.syl-part.initial .part-char{color:var(--emerald)}.syl-part.initial .part-label{color:var(--emerald);opacity:.6}
+.syl-part.medial{background:var(--amber-dim);border:1px solid rgba(251,191,36,0.15)}
+.syl-part.medial .part-char{color:var(--amber)}.syl-part.medial .part-label{color:var(--amber);opacity:.6}
+.syl-part.final{background:var(--rose-dim);border:1px solid rgba(251,113,133,0.15)}
+.syl-part.final .part-char{color:var(--rose)}.syl-part.final .part-label{color:var(--rose);opacity:.6}
+.syl-plus{color:var(--text-sub);font-size:1rem;font-weight:300}
+.syl-arrow{color:var(--text-sub);font-size:1.2rem;align-self:center}
+.reading-guide{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.25rem;margin-top:1rem}
+.reading-guide h4{font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-sub);margin-bottom:0.75rem}
+.reading-row{display:flex;align-items:center;gap:0.75rem;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.85rem}
+.reading-row:last-child{border-bottom:none}
+.reading-row .rr-syl{font-family:'Noto Sans KR',sans-serif;font-size:1.2rem;font-weight:500;min-width:30px;color:var(--emerald)}
+.reading-row .rr-roman{color:var(--amber);min-width:80px;font-weight:600}
+.reading-row .rr-explain{color:var(--text-dim);font-size:0.8rem}
+
+/* VOCAB */
+.vocab-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem}
+.vocab-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1.25rem;text-align:center;cursor:pointer;transition:all 0.25s;
+}
+.vocab-card:hover{border-color:var(--emerald);transform:translateY(-2px)}
+.vocab-card .kr{font-family:'Noto Sans KR',sans-serif;font-size:2rem;font-weight:500;display:block;margin-bottom:0.3rem}
+.vocab-card .roman{font-size:0.75rem;color:var(--text-dim);margin-bottom:0.15rem}
+.vocab-card .meaning{font-size:0.85rem;font-weight:600}
+
+/* CATEGORY TABS */
+.cat-tabs{display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:1.25rem}
+.cat-tab{
+  padding:0.4rem 1rem;border-radius:100px;font-size:0.78rem;font-weight:600;
+  cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text-dim);
+  transition:all 0.2s;
+}
+.cat-tab:hover{border-color:var(--emerald);color:var(--text)}
+.cat-tab.active{background:var(--emerald-dim);color:var(--emerald);border-color:var(--emerald)}
+
+/* QUIZ LEVELS */
+.levels-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.75rem}
+.level-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1.25rem;cursor:pointer;transition:all 0.25s;position:relative;overflow:hidden;
+}
+.level-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--border);transition:background 0.3s}
+.level-card:hover:not(.locked){border-color:var(--emerald);transform:translateY(-2px)}
+.level-card.active{border-color:var(--emerald);box-shadow:var(--emerald-glow)}
+.level-card.active::before{background:var(--emerald)}
+.level-card.completed::before{background:var(--emerald)}
+.level-card.locked{opacity:0.35;cursor:not-allowed}
+.level-num{font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-sub);margin-bottom:0.4rem}
+.level-name{font-size:1rem;font-weight:600;margin-bottom:0.25rem}
+.level-desc{font-size:0.75rem;color:var(--text-dim);margin-bottom:0.5rem;line-height:1.4}
+.level-meta{display:flex;justify-content:space-between;align-items:center;font-size:0.7rem}
+.level-status{font-weight:600;letter-spacing:0.5px}
+.level-status.locked-status{color:var(--text-sub)}.level-status.available{color:var(--emerald)}.level-status.done{color:var(--emerald)}
+.level-stars{letter-spacing:2px}
+.level-stars .filled{color:var(--amber)}.level-stars .empty{color:var(--border)}
+
+/* QUIZ */
+.quiz-container{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:2rem}
+.quiz-level-badge{display:inline-block;font-size:0.65rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--emerald);border:1px solid rgba(52,211,153,0.3);padding:0.2rem 0.75rem;border-radius:3px;margin-bottom:0.75rem}
+.quiz-question{text-align:center;margin-bottom:2rem}
+.quiz-question .prompt{font-size:0.85rem;color:var(--text-dim);margin-bottom:0.75rem}
+.quiz-question .target-char{font-family:'Noto Sans KR',sans-serif;font-size:5rem;font-weight:500;color:var(--emerald);display:block}
+.quiz-options{display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem;max-width:500px;margin:0 auto}
+.quiz-opt{
+  background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+  padding:1.1rem;text-align:center;cursor:pointer;transition:all 0.2s;
+  font-size:1rem;font-weight:600;color:var(--text);
+}
+.quiz-opt:hover{border-color:var(--emerald);background:var(--emerald-dim);transform:translateY(-2px)}
+.quiz-opt.correct{border-color:var(--emerald);background:var(--emerald-dim);color:var(--emerald);box-shadow:var(--emerald-glow)}
+.quiz-opt.wrong{border-color:var(--rose);background:var(--rose-dim);color:var(--rose)}
+.quiz-footer{text-align:center;margin-top:1.5rem;display:flex;justify-content:center;align-items:center;gap:2rem}
+.quiz-score{font-size:0.85rem;color:var(--text-dim)}.quiz-score span{color:var(--emerald);font-weight:700}
+.quiz-progress-bar{width:200px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.quiz-progress-fill{height:100%;background:var(--emerald);border-radius:2px;transition:width 0.4s}
+.level-complete-overlay{text-align:center;padding:2rem;animation:fadeIn 0.4s}
+.level-complete-overlay .big-emoji{font-size:3rem;margin-bottom:0.75rem;display:block}
+.level-complete-overlay h3{font-size:1.4rem;font-weight:700;margin-bottom:0.5rem}
+.level-complete-overlay .result-text{font-size:1rem;color:var(--text-dim);margin-bottom:1.5rem}
+.level-complete-overlay .stars-display{font-size:2rem;letter-spacing:6px;margin-bottom:1rem}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.75rem 1.5rem;border-radius:8px;font-size:0.82rem;font-weight:600;border:none;cursor:pointer;transition:all 0.25s;letter-spacing:0.5px}
+.btn-primary{background:var(--emerald);color:var(--bg)}.btn-primary:hover{opacity:0.9;transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--emerald);border:1px solid var(--emerald)}.btn-outline:hover{background:var(--emerald-dim)}
+.btn-sm{padding:0.5rem 1.2rem;border-radius:6px;font-size:0.75rem;font-weight:600;cursor:pointer;transition:all 0.2s;border:1px solid var(--border);background:transparent;color:var(--text-dim)}
+.btn-sm:hover{border-color:var(--text-dim);color:var(--text)}
+.btn-sm.primary{border-color:var(--emerald);color:var(--emerald)}.btn-sm.primary:hover{background:var(--emerald);color:var(--bg)}
+
+/* RULES CARDS */
+.rule-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1.5rem;margin-bottom:1rem;
+}
+.rule-card h3{font-size:1rem;font-weight:600;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.5rem}
+.rule-card p{color:var(--text-dim);font-size:0.85rem;line-height:1.7;margin-bottom:0.75rem}
+.rule-example{
+  background:var(--bg2);border:1px solid var(--border);border-radius:8px;
+  padding:0.75rem 1rem;font-size:0.85rem;display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem;
+}
+.rule-example .before{color:var(--rose);text-decoration:line-through}
+.rule-example .arrow{color:var(--text-sub)}
+.rule-example .after{color:var(--emerald);font-weight:600}
+
+/* COMPARE TABLE */
+.compare-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem}
+.compare-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1.5rem;text-align:center;
+}
+.compare-chars{display:flex;justify-content:center;gap:1rem;margin-bottom:1rem}
+.compare-char{
+  font-family:'Noto Sans KR',sans-serif;font-size:2.5rem;font-weight:500;
+  padding:0.5rem 1rem;border-radius:10px;
+}
+.compare-char.c1{color:var(--emerald);background:var(--emerald-dim)}
+.compare-char.c2{color:var(--amber);background:var(--amber-dim)}
+.compare-char.c3{color:var(--rose);background:var(--rose-dim)}
+.compare-desc{font-size:0.82rem;color:var(--text-dim);line-height:1.6}
+
+/* PARTICLE TABLE */
+.particle-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1.5rem;margin-bottom:1rem;
+}
+.particle-name{font-family:'Noto Sans KR',sans-serif;font-size:1.5rem;font-weight:500;color:var(--emerald);margin-bottom:0.25rem}
+.particle-usage{font-size:0.82rem;color:var(--text-dim);line-height:1.7;margin-bottom:0.75rem}
+.particle-ex{
+  background:var(--bg2);border:1px solid var(--border);border-radius:8px;
+  padding:0.6rem 1rem;margin-bottom:0.4rem;font-size:0.85rem;
+}
+.particle-ex .kr{font-family:'Noto Sans KR',sans-serif;font-weight:500}
+.particle-ex .meaning{color:var(--text-dim);font-size:0.78rem}
+
+/* KEYBOARD */
+.kb-container{max-width:420px;margin:0 auto}
+.kb-row{display:flex;justify-content:center;gap:0.3rem;margin-bottom:0.3rem}
+.kb-key{
+  min-width:38px;height:42px;border:1px solid var(--border);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Noto Sans KR',sans-serif;font-size:1.1rem;font-weight:500;
+  cursor:pointer;transition:all 0.15s;background:var(--bg2);color:var(--text);
+}
+.kb-key:hover{background:var(--emerald-dim);border-color:var(--emerald)}
+.kb-key:active{transform:scale(0.95)}
+.kb-key.wide{min-width:56px;font-size:0.7rem;letter-spacing:1px}
+.kb-key.space{flex:1;max-width:200px}
+.kb-output{
+  font-family:'Noto Sans KR',sans-serif;font-size:1.5rem;font-weight:500;
+  min-height:3rem;padding:0.75rem 1rem;
+  background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+  margin-bottom:1rem;text-align:center;word-break:break-all;
+}
+
+/* DAILY WORD */
+.daily-word{
+  background:linear-gradient(135deg,rgba(52,211,153,0.05),rgba(251,191,36,0.05));
+  border:1px solid var(--border);border-radius:var(--radius);
+  padding:2rem;margin-bottom:2rem;text-align:center;
+}
+.daily-word .dw-label{font-size:0.6rem;text-transform:uppercase;letter-spacing:3px;color:var(--text-sub);margin-bottom:0.75rem}
+.daily-word .dw-kr{font-family:'Noto Sans KR',sans-serif;font-size:3rem;font-weight:500;color:var(--emerald);margin-bottom:0.25rem}
+.daily-word .dw-roman{font-size:0.9rem;color:var(--amber);font-weight:600;margin-bottom:0.15rem}
+.daily-word .dw-meaning{font-size:1rem;font-weight:600;margin-bottom:0.75rem}
+.daily-word .dw-breakdown{display:flex;justify-content:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem}
+.daily-word .dw-btn{cursor:pointer;transition:all 0.2s}
+
+/* MOBILE BOTTOM NAV */
+.bottom-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:var(--card);border-top:1px solid var(--border);
+  padding:0.4rem 0.5rem env(safe-area-inset-bottom,0.4rem);
+}
+.bottom-nav-inner{display:flex;justify-content:space-around}
+.btm-item{
+  display:flex;flex-direction:column;align-items:center;gap:0.15rem;
+  padding:0.35rem 0.5rem;border-radius:8px;cursor:pointer;
+  background:none;border:none;color:var(--text-dim);font-size:0.55rem;font-weight:600;
+  letter-spacing:0.5px;transition:all 0.2s;min-width:48px;
+}
+.btm-item .icon{font-size:1.15rem}
+.btm-item.active{color:var(--emerald)}
+
+/* HAMBURGER */
+.hamburger{
+  display:none;position:fixed;top:1rem;left:1rem;z-index:200;
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  width:40px;height:40px;align-items:center;justify-content:center;
+  cursor:pointer;font-size:1.2rem;color:var(--text);
+}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99}
+
+/* WRITING CANVAS */
+.write-container{display:flex;gap:2rem;align-items:flex-start;flex-wrap:wrap}
+.write-char-selector{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1.5rem}
+.write-char-btn{
+  width:50px;height:50px;border:1px solid var(--border);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Noto Sans KR',sans-serif;font-size:1.5rem;font-weight:500;
+  cursor:pointer;transition:all 0.2s;background:var(--bg2);color:var(--text);
+}
+.write-char-btn:hover{border-color:var(--emerald);background:var(--emerald-dim)}
+.write-char-btn.active{border-color:var(--emerald);background:var(--emerald-dim);color:var(--emerald);box-shadow:var(--emerald-glow)}
+.write-canvas-wrap{
+  position:relative;width:300px;height:300px;
+  border:2px solid var(--border);border-radius:var(--radius);
+  background:var(--bg2);overflow:hidden;
+}
+.write-canvas-wrap canvas{position:absolute;top:0;left:0;width:100%;height:100%;cursor:crosshair}
+.write-ref-char{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-family:'Noto Sans KR',sans-serif;font-size:200px;font-weight:500;
+  color:rgba(255,255,255,0.06);pointer-events:none;user-select:none;
+  line-height:1;
+}
+.write-stroke-guides{
+  position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;
+}
+.write-controls{display:flex;gap:0.5rem;margin-top:0.75rem;flex-wrap:wrap}
+.write-result{
+  margin-top:1rem;padding:1rem;border-radius:var(--radius-xs);
+  font-size:0.9rem;font-weight:600;text-align:center;
+}
+.write-result.pass{background:var(--emerald-dim);color:var(--emerald);border:1px solid rgba(52,211,153,0.2)}
+.write-result.fail{background:var(--rose-dim);color:var(--rose);border:1px solid rgba(251,113,133,0.2)}
+.write-info{flex:1;min-width:250px}
+.write-info .info-row{display:flex;gap:1rem;margin-bottom:0.5rem;font-size:0.85rem}
+.write-info .info-label{color:var(--text-sub);min-width:80px}
+.write-info .info-value{font-weight:600}
+.write-progress-bar{width:100%;height:6px;background:var(--border);border-radius:3px;margin-top:0.75rem;overflow:hidden}
+.write-progress-fill{height:100%;border-radius:3px;transition:width 0.3s}
+.write-grid-lines{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;opacity:0.15}
+
+/* PRONUNCIATION LEARN */
+.pron-learn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem}
+.pron-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1.5rem;transition:all 0.25s;
+}
+.pron-card:hover{border-color:var(--emerald)}
+.pron-card .char{
+  font-family:'Noto Sans KR',sans-serif;font-size:3rem;font-weight:500;
+  display:inline-block;margin-bottom:0.5rem;
+}
+.pron-card .char.c{color:var(--emerald)}.pron-card .char.v{color:var(--amber)}
+.pron-card .roman{font-size:1rem;font-weight:700;color:var(--text-dim);margin-bottom:0.5rem}
+.pron-card .desc{font-size:0.82rem;color:var(--text-dim);line-height:1.6;margin-bottom:0.75rem}
+.pron-card .mouth{
+  background:var(--bg2);border:1px solid var(--border);border-radius:8px;
+  padding:0.75rem 1rem;font-size:0.82rem;line-height:1.6;margin-bottom:0.75rem;
+}
+.pron-card .mouth .label{font-size:0.6rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-sub);margin-bottom:0.3rem}
+.pron-card .play-btns{display:flex;gap:0.5rem;flex-wrap:wrap}
+.pron-play{
+  padding:0.4rem 0.85rem;border-radius:6px;font-size:0.75rem;font-weight:600;
+  cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text-dim);
+  transition:all 0.2s;display:flex;align-items:center;gap:0.35rem;
+}
+.pron-play:hover{border-color:var(--emerald);color:var(--emerald);background:var(--emerald-dim)}
+.pron-play.wrong:hover{border-color:var(--rose);color:var(--rose);background:var(--rose-dim)}
+.pron-play.playing{border-color:var(--emerald);color:var(--emerald);background:var(--emerald-dim)}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-overlay.open{display:block}
+  .hamburger{display:flex}
+  .main{margin-left:0}
+  .main-inner{padding:1.5rem 1.25rem 5rem}
+  h1{font-size:1.8rem}
+  .alpha-grid,.picker-grid{grid-template-columns:repeat(5,1fr)}
+  .vocab-grid{grid-template-columns:repeat(2,1fr)}
+  .result-card{flex-direction:column;text-align:center}
+  .quiz-options{grid-template-columns:1fr}
+  .bottom-nav{display:block}
+  .levels-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- HAMBURGER (mobile) -->
+<div class="hamburger" onclick="toggleSidebar()">☰</div>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<div class="app">
+
+<!-- ========== SIDEBAR ========== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <span class="dot"></span>
+      <div>
+        <span class="name">한글_OS</span>
+        <span class="sub">Learn Korean</span>
+      </div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label">Menu</div>
+      <button class="nav-item active" data-page="home" onclick="showPage('home')"><span class="icon">🏠</span><span class="label">Beranda</span></button>
+      <button class="nav-item" data-page="learn" onclick="showPage('learn')"><span class="icon">📖</span><span class="label">Belajar</span><span class="badge">24</span></button>
+      <button class="nav-item" data-page="translate" onclick="showPage('translate')"><span class="icon">🔍</span><span class="label">Translate</span></button>
+      <button class="nav-item" data-page="quiz" onclick="showPage('quiz')"><span class="icon">🎯</span><span class="label">Kuis</span><span class="badge">10</span></button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Tools</div>
+      <button class="nav-item" data-page="builder" onclick="showPage('builder')"><span class="icon">🧩</span><span class="label">Suku Kata</span></button>
+      <button class="nav-item" data-page="breakdown" onclick="showPage('breakdown')"><span class="icon">🔍</span><span class="label">Bedah Kata</span></button>
+      <button class="nav-item" data-page="writing" onclick="showPage('writing')"><span class="icon">✍️</span><span class="label">Latihan Menulis</span></button>
+      <button class="nav-item" data-page="keyboard" onclick="showPage('keyboard')"><span class="icon">⌨️</span><span class="label">Keyboard</span></button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Grammar</div>
+      <button class="nav-item" data-page="pronunciation" onclick="showPage('pronunciation')"><span class="icon">🗣️</span><span class="label">Pelafalan</span></button>
+      <button class="nav-item" data-page="pronunciation-learn" onclick="showPage('pronunciation-learn')"><span class="icon">👂</span><span class="label">Latihan Dengar</span></button>
+      <button class="nav-item" data-page="similar" onclick="showPage('similar')"><span class="icon">⚡</span><span class="label">Huruf Mirip</span></button>
+      <button class="nav-item" data-page="particles" onclick="showPage('particles')"><span class="icon">📎</span><span class="label">Partikel</span></button>
+    </div>
+  </nav>
+  <div class="sidebar-footer">v2.0 · <span id="totalXPFooter">⚡ 0 XP</span></div>
+</aside>
+
+<!-- ========== MAIN ========== -->
+<main class="main">
+<div class="main-inner">
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <div class="page-label">// Beranda</div>
+  <h1>Learn <span class="em">한글</span><br>from scratch.</h1>
+  <p class="subtitle">Interactive Korean alphabet learning. Consonants and vowels in one unified view, with instant word breakdown.</p>
+
+  <div class="daily-word" id="dailyWord"></div>
+
+  <div class="card" style="cursor:pointer" onclick="showPage('learn')">
+    <div class="card-header"><span class="card-title">📖 Mulai Belajar</span><span class="card-badge">→</span></div>
+    <p style="color:var(--text-dim);font-size:0.85rem">Pelajari 24 huruf dasar韩文 — konsonan & vokal dalam satu view.</p>
+  </div>
+  <div class="card" style="cursor:pointer" onclick="showPage('quiz')">
+    <div class="card-header"><span class="card-title">🎯 Kuis</span><span class="card-badge">10 Level</span></div>
+    <p style="color:var(--text-dim);font-size:0.85rem">Uji kemampuanmu! Dari konsonan dasar sampai baca kalimat.</p>
+  </div>
+  <div class="card" style="cursor:pointer" onclick="showPage('translate')">
+    <div class="card-header"><span class="card-title">🔍 Translate</span><span class="card-badge">ID → KR</span></div>
+    <p style="color:var(--text-dim);font-size:0.85rem">Ketik kata Indonesia, dapat韩文 + breakdown per huruf.</p>
+  </div>
+</div>
+
+<!-- LEARN -->
+<div class="page" id="page-learn">
+  <div class="page-label">// Alphabet Database</div>
+  <h2>모든 글자 — Semua Huruf Dasar</h2>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot c"></span> Konsonan</span>
+    <span class="legend-item"><span class="legend-dot v"></span> Vokal</span>
+    <span class="legend-item"><span class="legend-dot d"></span> Ganda</span>
+    <span class="legend-item"><span class="legend-dot cv"></span> Gabungan</span>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">Konsonan Dasar</span><span class="card-badge">14</span></div>
+    <div class="alpha-grid" id="gridConsonant"></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">Vokal Dasar</span><span class="card-badge">10</span></div>
+    <div class="alpha-grid" id="gridVowel"></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">Konsonan Ganda</span><span class="card-badge">5</span></div>
+    <div class="alpha-grid" id="gridDouble"></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">Vokal Gabungan</span><span class="card-badge">9</span></div>
+    <div class="alpha-grid" id="gridCombo"></div>
+  </div>
+  <div class="detail-panel" id="detailPanel" style="position:relative">
+    <button class="detail-close" onclick="closeDetail()">✕</button>
+    <div class="detail-header">
+      <div class="detail-char" id="detailChar"></div>
+      <div class="detail-info">
+        <div class="row"><span class="label">Nama</span><span class="value" id="detailName"></span></div>
+        <div class="row"><span class="label">Romanisasi</span><span class="value" id="detailRoman"></span></div>
+        <div class="row"><span class="label">Tipe</span><span class="value" id="detailType"></span></div>
+        <div class="row"><span class="label">Tips</span><span class="value" id="detailTip"></span></div>
+      </div>
+    </div>
+    <div class="detail-examples"><h4>Contoh Kata</h4><div id="detailExamples"></div></div>
+  </div>
+</div>
+
+<!-- TRANSLATE -->
+<div class="page" id="page-translate">
+  <div class="page-label">// Translate</div>
+  <h2>🔍 Indonesia → Korea</h2>
+  <p class="subtitle" style="margin-bottom:1.5rem">Ketik kata Indonesia, dapat韩文 lengkap dengan breakdown per suku kata.</p>
+  <div class="search-bar" style="max-width:100%">
+    <span class="icon">🔍</span>
+    <input type="text" id="translateInput" placeholder="Ketik kata Indonesia... contoh: mobil, rumah, makan" oninput="doTranslate(this.value)">
+  </div>
+  <div id="translateResult"></div>
+
+  <div class="section-label">Kategori Kosakata</div>
+  <div class="cat-tabs" id="vocabTabs"></div>
+  <div class="vocab-grid" id="vocabGrid"></div>
+</div>
+
+<!-- QUIZ -->
+<div class="page" id="page-quiz">
+  <div class="page-label">// Quiz Module</div>
+  <h2>🎯 Kuis Hangul</h2>
+  <p class="subtitle" style="margin-bottom:1.5rem">Selesaikan setiap level untuk membuka berikutnya. ⭐ ditentukan dari skor!</p>
+  <div id="quizLevelSelect"><div class="levels-grid" id="levelsGrid"></div></div>
+  <div class="quiz-container" id="quizActive" style="display:none">
+    <div class="quiz-level-badge" id="quizLevelBadge"></div>
+    <div class="quiz-question">
+      <div class="prompt" id="quizPrompt">Apa cara baca huruf ini?</div>
+      <span class="target-char" id="quizTarget">가</span>
+    </div>
+    <div class="quiz-options" id="quizOptions"></div>
+    <div class="quiz-footer">
+      <div class="quiz-score">Soal <span id="quizCurrent">1</span> / <span id="quizTotalQ">10</span></div>
+      <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quizProgress" style="width:0%"></div></div>
+      <div class="quiz-score">Benar: <span id="quizScore">0</span></div>
+    </div>
+  </div>
+  <div class="quiz-container" id="quizComplete" style="display:none">
+    <div class="level-complete-overlay">
+      <span class="big-emoji" id="completeEmoji">🎉</span>
+      <h3 id="completeTitle">Level Selesai!</h3>
+      <div class="stars-display" id="completeStars"></div>
+      <div class="result-text" id="completeResult"></div>
+      <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap">
+        <button class="btn-sm primary" id="btnNextLevel" onclick="goToNextLevel()">Next Level →</button>
+        <button class="btn-sm" onclick="backToLevels()">← Pilih Level</button>
+        <button class="btn-sm" onclick="retryLevel()">↺ Coba Lagi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BUILDER -->
+<div class="page" id="page-builder">
+  <div class="page-label">// Syllable Constructor</div>
+  <h2>🧩 Suku Kata</h2>
+  <p class="subtitle" style="margin-bottom:1.5rem">Pilih konsonan lalu vokal untuk membentuk blok suku kata.</p>
+  <div class="card">
+    <div class="builder-area">
+      <div class="builder-slots">
+        <div class="builder-preview" id="builderPreview">?</div>
+        <div class="slot-row">
+          <div class="slot active" id="slotC" onclick="activateSlot('C')"><span id="slotCVal"></span><span class="slot-label">Konsonan</span></div>
+          <div class="slot" id="slotV" onclick="activateSlot('V')"><span id="slotVVal"></span><span class="slot-label">Vokal</span></div>
+        </div>
+        <div style="display:flex;gap:0.5rem;margin-top:1.5rem">
+          <button class="btn-sm" onclick="clearBuilder()">↺ Reset</button>
+        </div>
+      </div>
+      <div class="builder-picker">
+        <div class="picker-title" id="pickerTitle">Pilih Konsonan</div>
+        <div class="picker-grid" id="pickerGrid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BREAKDOWN -->
+<div class="page" id="page-breakdown">
+  <div class="page-label">// Word Decomposition</div>
+  <h2>🔍 Bedah Kata</h2>
+  <p class="subtitle" style="margin-bottom:1.5rem">Pilih kata, lihat cara setiap suku kata disusun dari huruf dasar.</p>
+  <div class="card">
+    <div class="word-selector" id="wordSelector"></div>
+    <div class="word-display">
+      <div class="big-word" id="bdBigWord"></div>
+      <div class="word-meaning" id="bdMeaning"></div>
+      <div class="word-roman" id="bdRoman"></div>
+    </div>
+    <div class="syllable-breakdown" id="sylBreakdown"></div>
+    <div class="reading-guide" id="readingGuide" style="display:none">
+      <h4>📖 Cara Baca Step-by-Step</h4>
+      <div id="readingRows"></div>
+    </div>
+  </div>
+</div>
+
+<!-- WRITING PRACTICE -->
+<div class="page" id="page-writing">
+  <div class="page-label">// Latihan Menulis</div>
+  <h2>✍️ Menulis韩文</h2>
+  <p class="subtitle" style="margin-bottom:1.5rem">Latihan menulis huruf Korea di canvas. Toleransi akurasi 10%.</p>
+  <div class="card">
+    <div class="write-char-selector" id="writeCharSelector"></div>
+    <div class="write-container">
+      <div>
+        <div class="write-canvas-wrap">
+          <div class="write-ref-char" id="writeRefChar">ㄱ</div>
+          <svg class="write-grid-lines" viewBox="0 0 300 300">
+            <line x1="150" y1="0" x2="150" y2="300" stroke="white" stroke-width="0.5"/>
+            <line x1="0" y1="150" x2="300" y2="150" stroke="white" stroke-width="0.5"/>
+            <line x1="0" y1="0" x2="300" y2="300" stroke="white" stroke-width="0.3" stroke-dasharray="8,8"/>
+            <line x1="300" y1="0" x2="0" y2="300" stroke="white" stroke-width="0.3" stroke-dasharray="8,8"/>
+          </svg>
+          <canvas id="writeCanvas" width="600" height="600"></canvas>
+        </div>
+        <div class="write-controls">
+          <button class="btn-sm" onclick="clearCanvas()">↺ Ulang</button>
+          <button class="btn-sm primary" onclick="checkWriting()">✓ Cek Akurasi</button>
+          <button class="btn-sm" onclick="showNextWriteChar()">→ Huruf Berikutnya</button>
+        </div>
+        <div id="writeResult"></div>
+      </div>
+      <div class="write-info">
+        <h3 style="margin-bottom:0.75rem">Cara Menulis</h3>
+        <div class="info-row"><span class="info-label">Huruf</span><span class="info-value" id="writeInfoChar">ㄱ</span></div>
+        <div class="info-row"><span class="info-label">Nama</span><span class="info-value" id="writeInfoName">기역</span></div>
+        <div class="info-row"><span class="info-label">Urutan</span><span class="info-value" id="writeInfoStroke">1 goresan: kiri→kanan</span></div>
+        <div id="writeStrokeGuide" style="margin-top:1rem;font-size:0.82rem;color:var(--text-dim);line-height:1.7"></div>
+        <div style="margin-top:1.25rem">
+          <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-sub);margin-bottom:0.5rem">Akurasi</div>
+          <div class="write-progress-bar"><div class="write-progress-fill" id="writeProgressFill" style="width:0%;background:var(--border)"></div></div>
+          <div style="font-size:0.85rem;margin-top:0.3rem;font-weight:600" id="writeAccuracyText">-</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- KEYBOARD -->
+<div class="page" id="page-keyboard">
+  <div class="page-label">// Virtual Keyboard</div>
+  <h2>⌨️ Keyboard Korea</h2>
+  <p class="subtitle" style="margin-bottom:1.5rem">Latihan ngetik huruf Korea langsung di layar.</p>
+  <div class="card">
+    <div class="kb-container">
+      <div class="kb-output" id="kbOutput"></div>
+      <div class="kb-row" id="kbRow1"></div>
+      <div class="kb-row" id="kbRow2"></div>
+      <div class="kb-row" id="kbRow3"></div>
+      <div class="kb-row" id="kbRow4"></div>
+      <div style="display:flex;justify-content:center;gap:0.5rem;margin-top:0.75rem">
+        <button class="btn-sm" onclick="kbBackspace()">⌫ Hapus</button>
+        <button class="btn-sm" onclick="kbClear()">🗑️ Clear</button>
+        <button class="btn-sm primary" onclick="kbSpeak()">🔊 Dengar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRONUNCIATION -->
+<div class="page" id="page-pronunciation">
+  <div class="page-label">// Pronunciation Rules</div>
+  <h2>🗣️ Aturan Pelafalan</h2>
+  <p class="subtitle" style="margin-bottom:1.5rem">Korea punya aturan bunyi yang berubah tergantung konteks. Pahami ini biar cara bacamu benar!</p>
+  <div id="pronunciationRules"></div>
+</div>
+
+<!-- PRONUNCIATION LEARN -->
+<div class="page" id="page-pronunciation-learn">
+  <div class="page-label">// Latihan Pengucapan</div>
+  <h2>👂 Dengar & Bedakan</h2>
+  <p class="subtitle" style="margin-bottom:1.5rem">Dengar cara baca yang benar dan salah. Bandingkan supaya telinga terbiasa.</p>
+  <div class="legend" style="margin-bottom:1.5rem">
+    <span class="legend-item">🔊 Benar = pengucapan yang tepat</span>
+    <span class="legend-item">❌ Salah = pengucapan yang sering keliru</span>
+  </div>
+  <div class="pron-learn-grid" id="pronLearnGrid"></div>
+</div>
+
+<!-- SIMILAR -->
+<div class="page" id="page-similar">
+  <div class="page-label">// Similar Characters</div>
+  <h2>⚡ Huruf yang Sering Tertukar</h2>
+  <p class="subtitle" style="margin-bottom:1.5rem">Huruf-huruf yang mirip tapi beda bunyi. Jangan sampai salah!</p>
+  <div class="compare-grid" id="compareGrid"></div>
+</div>
+
+<!-- PARTICLES -->
+<div class="page" id="page-particles">
+  <div class="page-label">// Basic Particles</div>
+  <h2>📎 Partikel Dasar</h2>
+  <p class="subtitle" style="margin-bottom:1.5rem">Partikel adalah fondasi grammar Korea. Tanpa ini, kamu tidak bisa menyusun kalimat.</p>
+  <div id="particleCards"></div>
+</div>
+
+</div><!-- main-inner -->
+</main>
+</div><!-- app -->
+
+<!-- BOTTOM NAV (mobile) -->
+<div class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="btm-item active" data-page="home" onclick="showPage('home')"><span class="icon">🏠</span>Home</button>
+    <button class="btm-item" data-page="learn" onclick="showPage('learn')"><span class="icon">📖</span>Belajar</button>
+    <button class="btm-item" data-page="translate" onclick="showPage('translate')"><span class="icon">🔍</span>Translate</button>
+    <button class="btm-item" data-page="quiz" onclick="showPage('quiz')"><span class="icon">🎯</span>Kuis</button>
+    <button class="btm-item" data-page="builder" onclick="showPage('builder')"><span class="icon">🧩</span>Tools</button>
+  </div>
+</div>
+
+<!-- ========== JAVASCRIPT ========== -->
+<script>
+// ========== NAVIGATION ==========
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelector(`.nav-item[data-page="${id}"]`)?.classList.add('active');
+  document.querySelectorAll('.btm-item').forEach(n => n.classList.remove('active'));
+  document.querySelector(`.btm-item[data-page="${id}"]`)?.classList.add('active');
+  window.scrollTo(0, 0);
+  if (window.innerWidth <= 768) closeSidebar();
+}
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+
+// ========== DATA ==========
+const HANGUL = {
+  consonants: [
+    {char:'ㄱ',name:'기역',roman:'G/K',tip:'Seperti "g" di "go", tapi lebih ringan',examples:[{kr:'가',roman:'ga',meaning:'rumah'},{kr:'고기',roman:'gogi',meaning:'daging'},{kr:'학교',roman:'hakgyo',meaning:'sekolah'}]},
+    {char:'ㄴ',name:'니은',roman:'N',tip:'Persis seperti "n" Indonesia',examples:[{kr:'나',roman:'na',meaning:'aku'},{kr:'누나',roman:'nuna',meaning:'kakak perempuan'},{kr:'남자',roman:'namja',meaning:'pria'}]},
+    {char:'ㄷ',name:'디귿',roman:'D/T',tip:'"d" di awal, "t" di akhir kata',examples:[{kr:'다',roman:'da',meaning:'semua'},{kr:'독도',roman:'Dokdo',meaning:'Dokdo'},{kr:'밥',roman:'bap',meaning:'nasi'}]},
+    {char:'ㄹ',name:'리을',roman:'R/L',tip:'"r" di awal, "l" di akhir kata',examples:[{kr:'라면',roman:'ramyeon',meaning:'ramen'},{kr:'로봇',roman:'robot',meaning:'robot'},{kr:'말',roman:'mal',meaning:'kuda/bicara'}]},
+    {char:'ㅁ',name:'미음',roman:'M',tip:'Persis seperti "m" Indonesia',examples:[{kr:'마음',roman:'maeum',meaning:'hati'},{kr:'물',roman:'mul',meaning:'air'},{kr:'엄마',roman:'eomma',meaning:'ibu'}]},
+    {char:'ㅂ',name:'비읍',roman:'B/P',tip:'"b" di awal, "p" di akhir kata',examples:[{kr:'바다',roman:'bada',meaning:'laut'},{kr:'밥',roman:'bap',meaning:'nasi'},{kr:'빵',roman:'ppang',meaning:'roti'}]},
+    {char:'ㅅ',name:'시옷',roman:'S',tip:'Seperti "s" Indonesia',examples:[{kr:'사람',roman:'saram',meaning:'orang'},{kr:'수박',roman:'subak',meaning:'semangka'},{kr:'사과',roman:'sagwa',meaning:'apel'}]},
+    {char:'ㅇ',name:'이응',roman:'NG/-',tip:'Diam di awal vokal, "ng" di akhir',examples:[{kr:'아이',roman:'ai',meaning:'anak'},{kr:'영화',roman:'yeonghwa',meaning:'film'},{kr:'강',roman:'gang',meaning:'sungai'}]},
+    {char:'ㅈ',name:'지읒',roman:'J',tip:'Seperti "j" di "just"',examples:[{kr:'자동차',roman:'jadongcha',meaning:'mobil'},{kr:'저',roman:'jeo',meaning:'itu/saya'},{kr:'주스',roman:'juseu',meaning:'jus'}]},
+    {char:'ㅊ',name:'치읓',roman:'CH',tip:'Seperti "ch" di "cheese"',examples:[{kr:'치킨',roman:'chikin',meaning:'ayam goreng'},{kr:'차',roman:'cha',meaning:'mobil/teh'},{kr:'축구',roman:'chukgu',meaning:'sepak bola'}]},
+    {char:'ㅋ',name:'키읔',roman:'K',tip:'"k" yang ditekan lebih kuat',examples:[{kr:'커피',roman:'keopi',meaning:'kopi'},{kr:'코',roman:'ko',meaning:'hidung'},{kr:'케이크',roman:'keikeu',meaning:'kue'}]},
+    {char:'ㅌ',name:'티읕',roman:'T',tip:'"t" yang ditekan lebih kuat',examples:[{kr:'토마토',roman:'tomato',meaning:'tomat'},{kr:'택시',roman:'taeksi',meaning:'taksi'},{kr:'파스타',roman:'paseuta',meaning:'pasta'}]},
+    {char:'ㅍ',name:'피읖',roman:'P',tip:'"p" yang ditekan lebih kuat',examples:[{kr:'피자',roman:'pija',meaning:'pizza'},{kr:'파',roman:'pa',meaning:'daun bawang'},{kr:'포도',roman:'podo',meaning:'anggur'}]},
+    {char:'ㅎ',name:'히읗',roman:'H',tip:'Persis seperti "h" Indonesia',examples:[{kr:'하늘',roman:'haneul',meaning:'langit'},{kr:'한국',roman:'hanguk',meaning:'Korea'},{kr:'행복',roman:'haengbok',meaning:'bahagia'}]}
+  ],
+  vowels: [
+    {char:'ㅏ',name:'아',roman:'A',tip:'Seperti "a" di "papa"',examples:[{kr:'아기',roman:'agi',meaning:'bayi'},{kr:'나무',roman:'namu',meaning:'pohon'},{kr:'가방',roman:'gabang',meaning:'tas'}]},
+    {char:'ㅑ',name:'야',roman:'YA',tip:'Seperti "ya" di "yakin"',examples:[{kr:'야채',roman:'yachae',meaning:'sayur'},{kr:'약속',roman:'yaksok',meaning:'janji'},{kr:'야구',roman:'yagu',meaning:'bisbol'}]},
+    {char:'ㅓ',name:'어',roman:'EO',tip:'Seperti "o" di "song" tapi lebih terbuka',examples:[{kr:'어머니',roman:'eomeoni',meaning:'ibu'},{kr:'버스',roman:'beoseu',meaning:'bus'},{kr:'거북',roman:'geobuk',meaning:'kura-kura'}]},
+    {char:'ㅕ',name:'여',roman:'YEO',tip:'Gabungan "y" + "eo"',examples:[{kr:'여자',roman:'yeoja',meaning:'wanita'},{kr:'며느리',roman:'myeoneuri',meaning:'menantu'},{kr:'겨울',roman:'gyeoul',meaning:'musim dingin'}]},
+    {char:'ㅗ',name:'오',roman:'O',tip:'Seperti "o" di "go"',examples:[{kr:'오리',roman:'ori',meaning:'bebek'},{kr:'모자',roman:'moja',meaning:'topi'},{kr:'노래',roman:'norae',meaning:'lagu'}]},
+    {char:'ㅛ',name:'요',roman:'YO',tip:'Gabungan "y" + "o"',examples:[{kr:'요리',roman:'yori',meaning:'masak'},{kr:'교실',roman:'gyosil',meaning:'ruang kelas'},{kr:'휴일',roman:'hyuil',meaning:'hari libur'}]},
+    {char:'ㅜ',name:'우',roman:'U',tip:'Seperti "u" di "buku"',examples:[{kr:'우유',roman:'uyu',meaning:'susu'},{kr:'무',roman:'mu',meaning:'lobak'},{kr:'구두',roman:'gudu',meaning:'sepatu'}]},
+    {char:'ㅠ',name:'유',roman:'YU',tip:'Gabungan "y" + "u"',examples:[{kr:'유리',roman:'yuri',meaning:'kaca'},{kr:'규칙',roman:'gyuchik',meaning:'aturan'},{kr:'뉴욕',roman:'nyuyok',meaning:'New York'}]},
+    {char:'ㅡ',name:'으',roman:'EU',tip:'Seperti "u" tapi tanpa bibir',examples:[{kr:'으뜸',roman:'euttem',meaning:'terbaik'},{kr:'음악',roman:'eumak',meaning:'musik'},{kr:'슬프다',roman:'seulpeuda',meaning:'sedih'}]},
+    {char:'ㅣ',name:'이',roman:'I',tip:'Seperti "i" di "ini"',examples:[{kr:'이름',roman:'ireum',meaning:'nama'},{kr:'기차',roman:'gicha',meaning:'kereta'},{kr:'김치',roman:'gimchi',meaning:'kimchi'}]}
+  ],
+  doubleConsonants: [
+    {char:'ㄲ',name:'쌍기역',roman:'KK',tip:'ㄱ yang lebih kuat',examples:[{kr:'까치',roman:'kkachi',meaning:'burung gagak'},{kr:'깨',roman:'kkae',meaning:'wijen'}]},
+    {char:'ㄸ',name:'쌍디귿',roman:'TT',tip:'ㄷ yang lebih kuat',examples:[{kr:'또',roman:'tto',meaning:'lagi'},{kr:'딸기',roman:'ttalgi',meaning:'stroberi'}]},
+    {char:'ㅃ',name:'쌍비읍',roman:'PP',tip:'ㅂ yang lebih kuat',examples:[{kr:'빠르다',roman:'ppareuda',meaning:'cepat'},{kr:'뼈',roman:'ppyeo',meaning:'tulang'}]},
+    {char:'ㅆ',name:'쌍시옷',roman:'SS',tip:'ㅅ yang lebih kuat',examples:[{kr:'씨',roman:'ssi',meaning:'biji'},{kr:'싸다',roman:'ssada',meaning:'murah'}]},
+    {char:'ㅉ',name:'쌍지읒',roman:'JJ',tip:'ㅈ yang lebih kuat',examples:[{kr:'짜다',roman:'jjada',meaning:'asin'},{kr:'찌개',roman:'jjigae',meaning:'sup'}]}
+  ],
+  comboVowels: [
+    {char:'ㅐ',name:'애',roman:'AE',tip:'Seperti "e" di "bed"',examples:[{kr:'개',roman:'gae',meaning:'anjing'},{kr:'새',roman:'sae',meaning:'burung'}]},
+    {char:'ㅔ',name:'에',roman:'E',tip:'Hampir sama dengan ㅐ',examples:[{kr:'네',roman:'ne',meaning:'ya'},{kr:'세상',roman:'sesang',meaning:'dunia'}]},
+    {char:'ㅘ',name:'와',roman:'WA',tip:'Gabungan ㅗ + ㅏ',examples:[{kr:'과일',roman:'gwail',meaning:'buah'},{kr:'사과',roman:'sagwa',meaning:'apel'}]},
+    {char:'ㅙ',name:'왜',roman:'WAE',tip:'Gabungan ㅗ + ㅐ',examples:[{kr:'왜',roman:'wae',meaning:'kenapa'},{kr:'돼지',roman:'dwaeji',meaning:'babi'}]},
+    {char:'ㅚ',name:'외',roman:'OE',tip:'Gabungan ㅗ + ㅣ',examples:[{kr:'외국',roman:'oeguk',meaning:'luar negeri'}]},
+    {char:'ㅝ',name:'워',roman:'WO',tip:'Gabungan ㅜ + ㅓ',examples:[{kr:'뭐',roman:'mwo',meaning:'apa'},{kr:'원숭이',roman:'wonsungi',meaning:'monyet'}]},
+    {char:'ㅞ',name:'웨',roman:'WE',tip:'Gabungan ㅜ + ㅔ',examples:[{kr:'웨이터',roman:'weiteo',meaning:'pelayan'}]},
+    {char:'ㅟ',name:'위',roman:'WI',tip:'Gabungan ㅜ + ㅣ',examples:[{kr:'위',roman:'wi',meaning:'atas/perut'},{kr:'귀',roman:'gwi',meaning:'telinga'}]},
+    {char:'ㅢ',name:'의',roman:'UI',tip:'Gabungan ㅡ + ㅣ',examples:[{kr:'의사',roman:'uisa',meaning:'dokter'},{kr:'의미',roman:'uimi',meaning:'arti'}]}
+  ]
+};
+
+// ========== VOCABULARY ==========
+const VOCAB = {
+  'Semua': [
+    {kr:'안녕하세요',roman:'annyeonghaseyo',meaning:'Halo (formal)'},{kr:'감사합니다',roman:'gamsahamnida',meaning:'Terima kasih'},
+    {kr:'사랑해요',roman:'saranghaeyo',meaning:'Aku cinta kamu'},{kr:'네',roman:'ne',meaning:'Ya'},{kr:'아니요',roman:'aniyo',meaning:'Tidak'},
+    {kr:'물',roman:'mul',meaning:'Air'},{kr:'밥',roman:'bap',meaning:'Nasi'},{kr:'친구',roman:'chingu',meaning:'Teman'},
+    {kr:'학교',roman:'hakgyo',meaning:'Sekolah'},{kr:'집',roman:'jip',meaning:'Rumah'},{kr:'한국어',roman:'hangugeo',meaning:'Bahasa Korea'},
+    {kr:'이름',roman:'ireum',meaning:'Nama'},{kr:'차',roman:'cha',meaning:'Mobil/Teh'},{kr:'사과',roman:'sagwa',meaning:'Apel'},
+    {kr:'바다',roman:'bada',meaning:'Laut'},{kr:'하늘',roman:'haneul',meaning:'Langit'},{kr:'나무',roman:'namu',meaning:'Pohon'},
+    {kr:'고기',roman:'gogi',meaning:'Daging'},{kr:'커피',roman:'keopi',meaning:'Kopi'},{kr:'빵',roman:'ppang',meaning:'Roti'}
+  ],
+  '🍚 Makanan': [
+    {kr:'밥',roman:'bap',meaning:'Nasi'},{kr:'물',roman:'mul',meaning:'Air'},{kr:'고기',roman:'gogi',meaning:'Daging'},
+    {kr:'과일',roman:'gwail',meaning:'Buah'},{kr:'빵',roman:'ppang',meaning:'Roti'},{kr:'커피',roman:'keopi',meaning:'Kopi'},
+    {kr:'김치',roman:'gimchi',meaning:'Kimchi'},{kr:'라면',roman:'ramyeon',meaning:'Ramen'},{kr:'치킨',roman:'chikin',meaning:'Ayam goreng'},
+    {kr:'피자',roman:'pija',meaning:'Pizza'},{kr:'사과',roman:'sagwa',meaning:'Apel'},{kr:'수박',roman:'subak',meaning:'Semangka'}
+  ],
+  '🔢 Angka': [
+    {kr:'하나',roman:'hana',meaning:'Satu (Korea)'},{kr:'둘',roman:'dul',meaning:'Dua'},{kr:'셋',roman:'set',meaning:'Tiga'},
+    {kr:'넷',roman:'net',meaning:'Empat'},{kr:'다섯',roman:'daseot',meaning:'Lima'},{kr:'여섯',roman:'yeoseot',meaning:'Enam'},
+    {kr:'일',roman:'il',meaning:'Satu (Sino)'},{kr:'이',roman:'i',meaning:'Dua'},{kr:'삼',roman:'sam',meaning:'Tiga'},
+    {kr:'사',roman:'sa',meaning:'Empat'},{kr:'오',roman:'o',meaning:'Lima'},{kr:'육',roman:'yuk',meaning:'Enam'}
+  ],
+  '🚌 Transportasi': [
+    {kr:'차',roman:'cha',meaning:'Mobil'},{kr:'버스',roman:'beoseu',meaning:'Bus'},{kr:'택시',roman:'taeksi',meaning:'Taksi'},
+    {kr:'기차',roman:'gicha',meaning:'Kereta'},{kr:'비행기',roman:'bihaenggi',meaning:'Pesawat'},{kr:'자전거',roman:'jajeongeo',meaning:'Sepeda'}
+  ],
+  '👋 Salam': [
+    {kr:'안녕하세요',roman:'annyeonghaseyo',meaning:'Halo'},{kr:'감사합니다',roman:'gamsahamnida',meaning:'Terima kasih'},
+    {kr:'미안합니다',roman:'mianhamnida',meaning:'Maaf'},{kr:'안녕히 가세요',roman:'annyeonghi gaseyo',meaning:'Selamat jalan'},
+    {kr:'잘 먹겠습니다',roman:'jal meokgesseumnida',meaning:'Selamat makan'},{kr:'네',roman:'ne',meaning:'Ya'},{kr:'아니요',roman:'aniyo',meaning:'Tidak'}
+  ],
+  '🐶 Hewan': [
+    {kr:'개',roman:'gae',meaning:'Anjing'},{kr:'고양이',roman:'goyangi',meaning:'Kucing'},{kr:'새',roman:'sae',meaning:'Burung'},
+    {kr:'물고기',roman:'mulgogi',meaning:'Ikan'},{kr:'돼지',roman:'dwaeji',meaning:'Babi'},{kr:'원숭이',roman:'wonsungi',meaning:'Monyet'}
+  ],
+  '👨‍👩‍👧 Keluarga': [
+    {kr:'엄마',roman:'eomma',meaning:'Ibu'},{kr:'아빠',roman:'appa',meaning:'Ayah'},{kr:'형',roman:'hyeong',meaning:'Kakak laki-laki (pria bicara)'},
+    {kr:'누나',roman:'nuna',meaning:'Kakak perempuan (pria bicara)'},{kr:'오빠',roman:'oppa',meaning:'Kakak laki-laki (wanita bicara)'},
+    {kr:'언니',roman:'eonni',meaning:'Kakak perempuan (wanita bicara)'},{kr:'동생',roman:'dongsaeng',meaning:'Adik'}
+  ]
+};
+
+// ========== TRANSLATE DATABASE ==========
+const TRANSLATE_DB = [
+  {kr:'차',meaning:'Mobil',cat:'🚌 Transportasi'},{kr:'버스',meaning:'Bus',cat:'🚌 Transportasi'},
+  {kr:'택시',meaning:'Taksi',cat:'🚌 Transportasi'},{kr:'기차',meaning:'Kereta',cat:'🚌 Transportasi'},
+  {kr:'비행기',meaning:'Pesawat',cat:'🚌 Transportasi'},{kr:'자전거',meaning:'Sepeda',cat:'🚌 Transportasi'},
+  {kr:'학교',meaning:'Sekolah',cat:'📚 Tempat'},{kr:'집',meaning:'Rumah',cat:'📚 Tempat'},
+  {kr:'병원',meaning:'Rumah sakit',cat:'📚 Tempat'},{kr:'가게',meaning:'Toko',cat:'📚 Tempat'},
+  {kr:'식당',meaning:'Restoran',cat:'📚 Tempat'},{kr:'은행',meaning:'Bank',cat:'📚 Tempat'},
+  {kr:'밥',meaning:'Nasi',cat:'🍚 Makanan'},{kr:'물',meaning:'Air',cat:'🍚 Makanan'},
+  {kr:'고기',meaning:'Daging',cat:'🍚 Makanan'},{kr:'빵',meaning:'Roti',cat:'🍚 Makanan'},
+  {kr:'커피',meaning:'Kopi',cat:'🍚 Makanan'},{kr:'김치',meaning:'Kimchi',cat:'🍚 Makanan'},
+  {kr:'라면',meaning:'Ramen',cat:'🍚 Makanan'},{kr:'치킨',meaning:'Ayam goreng',cat:'🍚 Makanan'},
+  {kr:'피자',meaning:'Pizza',cat:'🍚 Makanan'},{kr:'사과',meaning:'Apel',cat:'🍚 Makanan'},
+  {kr:'수박',meaning:'Semangka',cat:'🍚 Makanan'},{kr:'과일',meaning:'Buah',cat:'🍚 Makanan'},
+  {kr:'사람',meaning:'Orang',cat:'👤 Orang'},{kr:'친구',meaning:'Teman',cat:'👤 Orang'},
+  {kr:'선생님',meaning:'Guru',cat:'👤 Orang'},{kr:'학생',meaning:'Pelajar',cat:'👤 Orang'},
+  {kr:'의사',meaning:'Dokter',cat:'👤 Orang'},{kr:'이름',meaning:'Nama',cat:'👤 Orang'},
+  {kr:'하늘',meaning:'Langit',cat:'🌍 Alam'},{kr:'바다',meaning:'Laut',cat:'🌍 Alam'},
+  {kr:'산',meaning:'Gunung',cat:'🌍 Alam'},{kr:'나무',meaning:'Pohon',cat:'🌍 Alam'},
+  {kr:'꽃',meaning:'Bunga',cat:'🌍 Alam'},{kr:'강',meaning:'Sungai',cat:'🌍 Alam'},
+  {kr:'개',meaning:'Anjing',cat:'🐶 Hewan'},{kr:'고양이',meaning:'Kucing',cat:'🐶 Hewan'},
+  {kr:'새',meaning:'Burung',cat:'🐶 Hewan'},{kr:'물고기',meaning:'Ikan',cat:'🐶 Hewan'},
+  {kr:'돼지',meaning:'Babi',cat:'🐶 Hewan'},{kr:'원숭이',meaning:'Monyet',cat:'🐶 Hewan'},
+  {kr:'크다',meaning:'Besar',cat:'📝 Kata Sifat'},{kr:'작다',meaning:'Kecil',cat:'📝 Kata Sifat'},
+  {kr:'좋다',meaning:'Baik/bagus',cat:'📝 Kata Sifat'},{kr:'나쁘다',meaning:'Buruk',cat:'📝 Kata Sifat'},
+  {kr:'예쁘다',meaning:'Cantik',cat:'📝 Kata Sifat'},{kr:'덥다',meaning:'Panas',cat:'📝 Kata Sifat'},
+  {kr:'춥다',meaning:'Dingin',cat:'📝 Kata Sifat'},{kr:'빠르다',meaning:'Cepat',cat:'📝 Kata Sifat'},
+  {kr:'먹다',meaning:'Makan',cat:'✏️ Kata Kerja'},{kr:'마시다',meaning:'Minum',cat:'✏️ Kata Kerja'},
+  {kr:'가다',meaning:'Pergi',cat:'✏️ Kata Kerja'},{kr:'오다',meaning:'Datang',cat:'✏️ Kata Kerja'},
+  {kr:'보다',meaning:'Melihat',cat:'✏️ Kata Kerja'},{kr:'듣다',meaning:'Mendengar',cat:'✏️ Kata Kerja'},
+  {kr:'말하다',meaning:'Bicara',cat:'✏️ Kata Kerja'},{kr:'읽다',meaning:'Membaca',cat:'✏️ Kata Kerja'},
+  {kr:'쓰다',meaning:'Menulis',cat:'✏️ Kata Kerja'},{kr:'자다',meaning:'Tidur',cat:'✏️ Kata Kerja'},
+  {kr:'하나',meaning:'Satu',cat:'🔢 Angka'},{kr:'둘',meaning:'Dua',cat:'🔢 Angka'},
+  {kr:'셋',meaning:'Tiga',cat:'🔢 Angka'},{kr:'넷',meaning:'Empat',cat:'🔢 Angka'},
+  {kr:'다섯',meaning:'Lima',cat:'🔢 Angka'},{kr:'열',meaning:'Sepuluh',cat:'🔢 Angka'},
+  {kr:'백',meaning:'Seratus',cat:'🔢 Angka'},{kr:'천',meaning:'Seribu',cat:'🔢 Angka'},
+  {kr:'엄마',meaning:'Ibu',cat:'👨‍👩‍👧 Keluarga'},{kr:'아빠',meaning:'Ayah',cat:'👨‍👩‍👧 Keluarga'},
+  {kr:'형',meaning:'Kakak laki-laki',cat:'👨‍👩‍👧 Keluarga'},{kr:'누나',meaning:'Kakak perempuan',cat:'👨‍👩‍👧 Keluarga'},
+  {kr:'오빠',meaning:'Kakak laki-laki (wanita)',cat:'👨‍👩‍👧 Keluarga'},{kr:'언니',meaning:'Kakak perempuan (wanita)',cat:'👨‍👩‍👧 Keluarga'}
+];
+
+// ========== RENDER ALPHABET ==========
+function renderAlphaGrid(containerId, items, type) {
+  const c = document.getElementById(containerId);
+  items.forEach(item => {
+    const cell = document.createElement('div');
+    cell.className = 'alpha-cell ' + type;
+    cell.innerHTML = `<span class="kr">${item.char}</span><span class="roman">${item.roman}</span>`;
+    cell.onclick = () => showDetail(item.char);
+    c.appendChild(cell);
+  });
+}
+renderAlphaGrid('gridConsonant', HANGUL.consonants, 'consonant');
+renderAlphaGrid('gridVowel', HANGUL.vowels, 'vowel');
+renderAlphaGrid('gridDouble', HANGUL.doubleConsonants, 'double');
+renderAlphaGrid('gridCombo', HANGUL.comboVowels, 'combo');
+
+// ========== DETAIL PANEL ==========
+function findChar(char) {
+  for (const [key, arr] of Object.entries(HANGUL)) {
+    const found = arr.find(h => h.char === char);
+    if (found) return {...found, category: key};
+  }
+  return null;
+}
+function showDetail(char) {
+  const data = findChar(char);
+  if (!data) return;
+  const classMap = {consonant:'c',vowel:'v',doubleConsonants:'d',comboVowels:'cv'};
+  const typeMap = {consonant:'Konsonan Dasar',vowel:'Vokal Dasar',doubleConsonants:'Konsonan Ganda',comboVowels:'Vokal Gabungan'};
+  document.getElementById('detailChar').textContent = data.char;
+  document.getElementById('detailChar').className = 'detail-char ' + (classMap[data.category]||'');
+  document.getElementById('detailName').textContent = data.name;
+  document.getElementById('detailRoman').textContent = data.roman;
+  document.getElementById('detailType').textContent = typeMap[data.category]||'';
+  document.getElementById('detailTip').textContent = data.tip;
+  document.getElementById('detailExamples').innerHTML = data.examples.map(ex =>
+    `<span class="example-word"><span class="kr">${ex.kr}</span> <span class="meaning">${ex.roman} — ${ex.meaning}</span></span>`
+  ).join('');
+  document.getElementById('detailPanel').classList.add('active');
+  document.getElementById('detailPanel').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function closeDetail() { document.getElementById('detailPanel').classList.remove('active'); }
+
+// ========== SYLLABLE BUILDER ==========
+let builderState = {consonant:'',vowel:'',activeSlot:'C'};
+const allConsonants = [...HANGUL.consonants,...HANGUL.doubleConsonants];
+const allVowels = [...HANGUL.vowels,...HANGUL.comboVowels];
+const INITIALS = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+const MEDIALS = ['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅘ','ㅙ','ㅚ','ㅛ','ㅜ','ㅝ','ㅞ','ㅟ','ㅠ','ㅡ','ㅢ','ㅣ'];
+function getInitialIndex(c){return INITIALS.indexOf(c)}
+function getMedialIndex(c){return MEDIALS.indexOf(c)}
+
+function renderPicker() {
+  const grid = document.getElementById('pickerGrid');
+  const title = document.getElementById('pickerTitle');
+  grid.innerHTML = '';
+  if (builderState.activeSlot === 'C') {
+    title.textContent = 'Pilih Konsonan';
+    allConsonants.forEach(c => {
+      const cell = document.createElement('div');
+      cell.className = 'picker-cell' + (builderState.consonant===c.char?' selected':'');
+      cell.textContent = c.char;
+      cell.onclick = () => selectConsonant(c.char);
+      grid.appendChild(cell);
+    });
+  } else {
+    title.textContent = 'Pilih Vokal';
+    allVowels.forEach(v => {
+      const cell = document.createElement('div');
+      cell.className = 'picker-cell vowel-pick' + (builderState.vowel===v.char?' selected':'');
+      cell.textContent = v.char;
+      cell.onclick = () => selectVowel(v.char);
+      grid.appendChild(cell);
+    });
+  }
+}
+function activateSlot(s) {
+  builderState.activeSlot = s;
+  document.getElementById('slotC').classList.toggle('active', s==='C');
+  document.getElementById('slotV').classList.toggle('active', s==='V');
+  renderPicker();
+}
+function selectConsonant(char) {
+  builderState.consonant = char;
+  document.getElementById('slotCVal').textContent = char;
+  document.getElementById('slotC').classList.add('filled');
+  builderState.activeSlot = 'V';
+  document.getElementById('slotC').classList.remove('active');
+  document.getElementById('slotV').classList.add('active');
+  updatePreview(); renderPicker();
+}
+function selectVowel(char) {
+  builderState.vowel = char;
+  document.getElementById('slotVVal').textContent = char;
+  document.getElementById('slotV').classList.add('filled');
+  updatePreview(); renderPicker();
+}
+function updatePreview() {
+  const preview = document.getElementById('builderPreview');
+  if (builderState.consonant && builderState.vowel) {
+    const ci = getInitialIndex(builderState.consonant), mi = getMedialIndex(builderState.vowel);
+    if (ci>=0 && mi>=0) {
+      preview.textContent = String.fromCharCode(0xAC00 + ci*588 + mi*28);
+      preview.classList.add('has-value');
+    }
+  } else { preview.textContent = '?'; preview.classList.remove('has-value'); }
+}
+function clearBuilder() {
+  builderState = {consonant:'',vowel:'',activeSlot:'C'};
+  document.getElementById('slotCVal').textContent = '';
+  document.getElementById('slotVVal').textContent = '';
+  document.getElementById('slotC').classList.remove('filled');
+  document.getElementById('slotV').classList.remove('filled');
+  document.getElementById('slotC').classList.add('active');
+  document.getElementById('slotV').classList.remove('active');
+  document.getElementById('builderPreview').textContent = '?';
+  document.getElementById('builderPreview').classList.remove('has-value');
+  renderPicker();
+}
+renderPicker();
+
+// ========== WORD BREAKDOWN ==========
+const FINALS = ['','ㄱ','ㄲ','ㄳ','ㄴ','ㄵ','ㄶ','ㄷ','ㄹ','ㄺ','ㄻ','ㄼ','ㄽ','ㄾ','ㄿ','ㅀ','ㅁ','ㅂ','ㅄ','ㅅ','ㅆ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+const INITIAL_ROMAN = ['g/k','kk','n','d/t','tt','r/l','m','b/p','pp','s','ss','ng/-','j','jj','ch','k','t','p','h'];
+const MEDIAL_ROMAN = ['a','ae','ya','yae','eo','e','yeo','ye','o','wa','wae','oe','yo','u','wo','we','wi','yu','eu','ui','i'];
+const FINAL_ROMAN = ['','k','kk','ks','n','nj','nh','t','r/l','lk','lm','lp','ls','lt','lp','lh','m','p','ps','s','ss','ng','j','ch','k','t','p','h'];
+
+function decomposeSyllable(char) {
+  const code = char.charCodeAt(0);
+  if (code < 0xAC00 || code > 0xD7A3) return null;
+  const offset = code - 0xAC00;
+  const ii = Math.floor(offset/588), mi = Math.floor((offset%588)/28), fi = offset%28;
+  return {char, initial:INITIALS[ii], initialRoman:INITIAL_ROMAN[ii], medial:MEDIALS[mi], medialRoman:MEDIAL_ROMAN[mi], final:FINALS[fi], finalRoman:FINAL_ROMAN[fi]};
+}
+
+const BREAKDOWN_WORDS = [
+  {kr:'안녕하세요',roman:'annyeonghaseyo',meaning:'Halo (formal)',guide:[
+    {syl:'안',parts:'ㅇ+ㅏ+ㄴ',explain:'ㅇ diam + ㅏ="a" + ㄴ="n" → "an"'},
+    {syl:'녕',parts:'ㄴ+ㅕ+ㅇ',explain:'ㄴ="n" + ㅕ="yeo" + ㅇ="ng" → "nyeong"'},
+    {syl:'하',parts:'ㅎ+ㅏ',explain:'ㅎ="h" + ㅏ="a" → "ha"'},
+    {syl:'세',parts:'ㅅ+ㅔ',explain:'ㅅ="s" + ㅔ="e" → "se"'},
+    {syl:'요',parts:'ㅛ',explain:'ㅛ="yo"'}
+  ]},
+  {kr:'감사합니다',roman:'gamsahamnida',meaning:'Terima kasih',guide:[
+    {syl:'감',parts:'ㄱ+ㅏ+ㅁ',explain:'ㄱ="g" + ㅏ="a" + ㅁ="m" → "gam"'},
+    {syl:'사',parts:'ㅅ+ㅏ',explain:'ㅅ="s" + ㅏ="a" → "sa"'},
+    {syl:'합',parts:'ㅎ+ㅏ+ㅂ',explain:'ㅎ="h" + ㅏ="a" + ㅂ="p" → "hap"'},
+    {syl:'니',parts:'ㄴ+ㅣ',explain:'ㄴ="n" + ㅣ="i" → "ni"'},
+    {syl:'다',parts:'ㄷ+ㅏ',explain:'ㄷ="d" + ㅏ="a" → "da"'}
+  ]},
+  {kr:'사랑해요',roman:'saranghaeyo',meaning:'Aku cinta kamu',guide:[
+    {syl:'사',parts:'ㅅ+ㅏ',explain:'ㅅ="s" + ㅏ="a" → "sa"'},
+    {syl:'랑',parts:'ㄹ+ㅏ+ㅇ',explain:'ㄹ="r" + ㅏ="a" + ㅇ="ng" → "rang"'},
+    {syl:'해',parts:'ㅎ+ㅐ',explain:'ㅎ="h" + ㅐ="ae" → "hae"'},
+    {syl:'요',parts:'ㅛ',explain:'ㅛ="yo"'}
+  ]},
+  {kr:'한국어',roman:'hangugeo',meaning:'Bahasa Korea',guide:[
+    {syl:'한',parts:'ㅎ+ㅏ+ㄴ',explain:'ㅎ="h" + ㅏ="a" + ㄴ="n" → "han"'},
+    {syl:'국',parts:'ㄱ+ㅜ+ㄱ',explain:'ㄱ="g" + ㅜ="u" + ㄱ="k" → "guk"'},
+    {syl:'어',parts:'ㅇ+ㅓ',explain:'ㅇ diam + ㅓ="eo" → "eo"'}
+  ]},
+  {kr:'학교',roman:'hakgyo',meaning:'Sekolah',guide:[
+    {syl:'학',parts:'ㅎ+ㅏ+ㄱ',explain:'ㅎ="h" + ㅏ="a" + ㄱ="k" → "hak"'},
+    {syl:'교',parts:'ㄱ+ㅛ',explain:'ㄱ="g" + ㅛ="yo" → "gyo"'}
+  ]},
+  {kr:'친구',roman:'chingu',meaning:'Teman',guide:[
+    {syl:'친',parts:'ㅊ+ㅣ+ㄴ',explain:'ㅊ="ch" + ㅣ="i" + ㄴ="n" → "chin"'},
+    {syl:'구',parts:'ㄱ+ㅜ',explain:'ㄱ="g" + ㅜ="u" → "gu"'}
+  ]},
+  {kr:'이름',roman:'ireum',meaning:'Nama',guide:[
+    {syl:'이',parts:'ㅇ+ㅣ',explain:'ㅇ diam + ㅣ="i" → "i"'},
+    {syl:'름',parts:'ㄹ+ㅡ+ㅁ',explain:'ㄹ="r" + ㅡ="eu" + ㅁ="m" → "reum"'}
+  ]},
+  {kr:'물',roman:'mul',meaning:'Air',guide:[
+    {syl:'물',parts:'ㅁ+ㅜ+ㄹ',explain:'ㅁ="m" + ㅜ="u" + ㄹ="l" → "mul"'}
+  ]},
+  {kr:'밥',roman:'bap',meaning:'Nasi',guide:[
+    {syl:'밥',parts:'ㅂ+ㅏ+ㅂ',explain:'ㅂ="b" + ㅏ="a" + ㅂ="p" → "bap"'}
+  ]},
+  {kr:'가방',roman:'gabang',meaning:'Tas',guide:[
+    {syl:'가',parts:'ㄱ+ㅏ',explain:'ㄱ="g" + ㅏ="a" → "ga"'},
+    {syl:'방',parts:'ㅂ+ㅏ+ㅇ',explain:'ㅂ="b" + ㅏ="a" + ㅇ="ng" → "bang"'}
+  ]}
+];
+
+let currentBreakdownWord = 0;
+function renderWordSelector() {
+  const c = document.getElementById('wordSelector'); c.innerHTML = '';
+  BREAKDOWN_WORDS.forEach((w,i) => {
+    const btn = document.createElement('button');
+    btn.className = 'word-btn' + (i===currentBreakdownWord?' active':'');
+    btn.textContent = w.kr;
+    btn.onclick = () => { currentBreakdownWord = i; renderWordSelector(); renderBreakdown(); };
+    c.appendChild(btn);
+  });
+}
+function renderBreakdown() {
+  const word = BREAKDOWN_WORDS[currentBreakdownWord];
+  document.getElementById('bdBigWord').textContent = word.kr;
+  document.getElementById('bdMeaning').textContent = word.meaning;
+  document.getElementById('bdRoman').textContent = word.roman;
+  const container = document.getElementById('sylBreakdown'); container.innerHTML = '';
+  [...word.kr].forEach((char,idx) => {
+    const d = decomposeSyllable(char);
+    if (!d) return;
+    const block = document.createElement('div');
+    block.className = 'syl-block';
+    let partsHTML = `<div class="syl-part initial"><span class="part-char">${d.initial}</span><span class="part-label">초성</span></div><span class="syl-plus">+</span><div class="syl-part medial"><span class="part-char">${d.medial}</span><span class="part-label">중성</span></div>`;
+    if (d.final) partsHTML += `<span class="syl-plus">+</span><div class="syl-part final"><span class="part-char">${d.final}</span><span class="part-label">종성</span></div>`;
+    block.innerHTML = `<div class="syl-char">${char}</div><div class="syl-arrow">⬇</div><div class="syl-parts">${partsHTML}</div>`;
+    container.appendChild(block);
+    if (idx < [...word.kr].length - 1) {
+      const arrow = document.createElement('div');
+      arrow.style.cssText = 'display:flex;align-items:center;color:var(--text-sub);font-size:1rem;padding:0 0.25rem;';
+      arrow.textContent = '→';
+      container.appendChild(arrow);
+    }
+  });
+  if (word.guide) {
+    document.getElementById('readingGuide').style.display = 'block';
+    const rows = document.getElementById('readingRows'); rows.innerHTML = '';
+    word.guide.forEach(g => {
+      const row = document.createElement('div');
+      row.className = 'reading-row';
+      row.innerHTML = `<span class="rr-syl">${g.syl}</span><span class="rr-roman">${g.parts}</span><span class="rr-explain">${g.explain}</span>`;
+      rows.appendChild(row);
+    });
+    const finalRow = document.createElement('div');
+    finalRow.className = 'reading-row';
+    finalRow.style.cssText = 'border-top:2px solid var(--border);margin-top:0.5rem;padding-top:0.75rem;font-weight:600;';
+    finalRow.innerHTML = `<span class="rr-syl" style="color:var(--emerald)">${word.kr}</span><span class="rr-roman" style="color:var(--emerald)">=</span><span class="rr-explain" style="color:var(--emerald);font-weight:600">${word.roman} — ${word.meaning}</span>`;
+    rows.appendChild(finalRow);
+  }
+}
+renderWordSelector(); renderBreakdown();
+
+// ========== TRANSLATE ==========
+function doTranslate(query) {
+  const resultDiv = document.getElementById('translateResult');
+  if (!query.trim()) { resultDiv.innerHTML = ''; return; }
+  const q = query.toLowerCase().trim();
+  const matches = TRANSLATE_DB.filter(t => t.meaning.toLowerCase().includes(q));
+  if (matches.length === 0) { resultDiv.innerHTML = '<div class="card"><p style="color:var(--text-dim);text-align:center">Kata tidak ditemukan. Coba kata lain.</p></div>'; return; }
+  resultDiv.innerHTML = matches.slice(0,6).map(item => {
+    const chars = [...item.kr];
+    let breakdownHTML = '';
+    chars.forEach((char,i) => {
+      const d = decomposeSyllable(char);
+      if (d) {
+        breakdownHTML += `<div class="bd-item init"><span class="bd-char">${d.initial}</span><span class="bd-label">${d.initialRoman}</span></div><span class="bd-plus">+</span><div class="bd-item med"><span class="bd-char">${d.medial}</span><span class="bd-label">${d.medialRoman}</span></div>`;
+        if (d.final) breakdownHTML += `<span class="bd-plus">+</span><div class="bd-item fin"><span class="bd-char">${d.final}</span><span class="bd-label">${d.finalRoman}</span></div>`;
+        if (i < chars.length-1) breakdownHTML += '<span class="bd-arrow">→</span>';
+      }
+    });
+    return `<div class="result-card" style="margin-bottom:1rem;cursor:pointer" onclick="speakKorean('${item.kr}')">
+      <div class="result-kr" style="font-size:3.5rem">${item.kr}</div>
+      <div class="result-info">
+        <div class="row"><span class="label">Indonesia</span><span class="value">${item.meaning}</span></div>
+        <div class="row"><span class="label">Korea</span><span class="value">${item.kr}</span></div>
+        <div class="row"><span class="label">Kategori</span><span class="value">${item.cat}</span></div>
+        <div style="font-size:0.75rem;color:var(--text-sub);margin:0.5rem 0">🔊 Klik untuk dengar</div>
+        <div class="result-breakdown">${breakdownHTML}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ========== VOCABULARY ==========
+let currentVocabCat = 'Semua';
+function renderVocabTabs() {
+  const tabs = document.getElementById('vocabTabs'); tabs.innerHTML = '';
+  Object.keys(VOCAB).forEach(cat => {
+    const tab = document.createElement('button');
+    tab.className = 'cat-tab' + (cat===currentVocabCat?' active':'');
+    tab.textContent = cat;
+    tab.onclick = () => { currentVocabCat = cat; renderVocabTabs(); renderVocabGrid(); };
+    tabs.appendChild(tab);
+  });
+}
+function renderVocabGrid() {
+  const grid = document.getElementById('vocabGrid'); grid.innerHTML = '';
+  VOCAB[currentVocabCat].forEach(v => {
+    const card = document.createElement('div');
+    card.className = 'vocab-card';
+    card.innerHTML = `<span class="kr">${v.kr}</span><span class="roman">${v.roman}</span><span class="meaning">${v.meaning}</span>`;
+    card.onclick = () => speakKorean(v.kr);
+    grid.appendChild(card);
+  });
+}
+renderVocabTabs(); renderVocabGrid();
+
+// ========== QUIZ LEVELS ==========
+const QUIZ_LEVELS = [
+  {id:1,name:'Konsonan Dasar',desc:'14 konsonan dasar韩文',count:10,items:()=>HANGUL.consonants.map(h=>({char:h.char,roman:h.roman})),xp:10},
+  {id:2,name:'Vokal Dasar',desc:'10 vokal dasar',count:10,items:()=>HANGUL.vowels.map(h=>({char:h.char,roman:h.roman})),xp:10},
+  {id:3,name:'Konsonan + Vokal',desc:'Campuran keduanya',count:12,items:()=>[...HANGUL.consonants,...HANGUL.vowels].map(h=>({char:h.char,roman:h.roman})),xp:15},
+  {id:4,name:'Konsonan Ganda',desc:'ㄲ ㄸ ㅃ ㅆ ㅉ',count:8,items:()=>HANGUL.doubleConsonants.map(h=>({char:h.char,roman:h.roman})),xp:20},
+  {id:5,name:'Vokal Gabungan',desc:'ㅐ ㅔ ㅘ ㅙ ㅚ ㅝ ㅞ ㅟ ㅢ',count:10,items:()=>HANGUL.comboVowels.map(h=>({char:h.char,roman:h.roman})),xp:20},
+  {id:6,name:'Semua Huruf Campur',desc:'Ujian total!',count:15,items:()=>[...HANGUL.consonants,...HANGUL.vowels,...HANGUL.doubleConsonants,...HANGUL.comboVowels].map(h=>({char:h.char,roman:h.roman})),xp:25},
+  {id:7,name:'Suku Kata Pertama',desc:'가 나 다 라 마 바 사 자 차',count:10,items:()=>{const syls=[];const init=['ㄱ','ㄴ','ㄷ','ㄹ','ㅁ','ㅂ','ㅅ','ㅈ','ㅊ'];const rom=['ga','na','da','ra','ma','ba','sa','ja','cha'];init.forEach((c,i)=>{const ci=getInitialIndex(c),mi=getMedialIndex('ㅏ');if(ci>=0&&mi>=0)syls.push({char:String.fromCharCode(0xAC00+ci*588+mi*28),roman:rom[i]});});return syls;},xp:30},
+  {id:8,name:'Suku Kata + Batchim',desc:'간 날 말 집 한',count:10,items:()=>{const data=[['ㄱ','ㅏ','ㄴ','gan'],['ㄴ','ㅏ','ㄹ','nal'],['ㅁ','ㅏ','ㄹ','mal'],['ㅈ','ㅣ','ㅂ','jip'],['ㅎ','ㅏ','ㄴ','han'],['ㅂ','ㅏ','ㄱ','bak'],['ㅅ','ㅏ','ㄹ','sal'],['ㄱ','ㅜ','ㄱ','guk'],['ㅁ','ㅜ','ㄹ','mul'],['ㅇ','ㅏ','ㄴ','an']];return data.map(([i,m,f,r])=>{const ci=getInitialIndex(i),mi=getMedialIndex(m),fi=FINALS.indexOf(f);if(ci>=0&&mi>=0)return{char:String.fromCharCode(0xAC00+ci*588+mi*28+fi),roman:r};return null}).filter(Boolean);},xp:35},
+  {id:9,name:'Kata Sehari-hari',desc:'안녕 감사 사랑 한국...',count:10,items:()=>[{char:'안녕',roman:'annyeong'},{char:'감사',roman:'gamsa'},{char:'사랑',roman:'sarang'},{char:'한국',roman:'hanguk'},{char:'친구',roman:'chingu'},{char:'음식',roman:'eumsik'},{char:'가방',roman:'gabang'},{char:'나무',roman:'namu'},{char:'바다',roman:'bada'},{char:'하늘',roman:'haneul'}],xp:40},
+  {id:10,name:'Boss Level — Kalimat',desc:'Baca kalimat lengkap!',count:8,items:()=>[{char:'안녕하세요',roman:'annyeonghaseyo'},{char:'감사합니다',roman:'gamsahamnida'},{char:'사랑해요',roman:'saranghaeyo'},{char:'미안합니다',roman:'mianhamnida'},{char:'이름이 뭐예요',roman:'ireumi mwoyeyo'},{char:'네, 좋아요',roman:'ne, joayo'},{char:'한국어 공부해요',roman:'hangugeo gongbuhaeyo'},{char:'오늘 날씨 좋아요',roman:'oneul nalssi joayo'}],xp:50}
+];
+
+let quizState = {currentLevel:null,questions:[],currentQ:0,score:0,answered:false,levelResults:{}};
+function loadProgress(){try{const s=localStorage.getItem('hangul_quiz_progress');if(s)quizState.levelResults=JSON.parse(s)}catch(e){}}
+function saveProgress(){try{localStorage.setItem('hangul_quiz_progress',JSON.stringify(quizState.levelResults))}catch(e){}}
+loadProgress();
+function isLevelUnlocked(id){if(id===1)return true;const p=quizState.levelResults[id-1];return p&&p.stars>=1}
+function getStars(s,t){const p=t>0?s/t:0;if(p>=.9)return 3;if(p>=.7)return 2;if(p>=.5)return 1;return 0}
+
+function renderLevels() {
+  const grid = document.getElementById('levelsGrid'); grid.innerHTML = '';
+  QUIZ_LEVELS.forEach(level => {
+    const unlocked = isLevelUnlocked(level.id);
+    const result = quizState.levelResults[level.id];
+    const stars = result ? result.stars : 0;
+    const card = document.createElement('div');
+    card.className = 'level-card' + (!unlocked?' locked':'') + (result&&stars>0?' completed':'');
+    let statusText, statusClass;
+    if (!unlocked) { statusText = '🔒 Terkunci'; statusClass = 'locked-status'; }
+    else if (result && stars > 0) { statusText = '✅ Selesai'; statusClass = 'done'; }
+    else { statusText = '▶ Main'; statusClass = 'available'; }
+    const starsHTML = [1,2,3].map(i=>`<span class="${i<=stars?'filled':'empty'}">★</span>`).join('');
+    card.innerHTML = `<div class="level-num">Level ${level.id}</div><div class="level-name">${level.name}</div><div class="level-desc">${level.desc}</div><div class="level-meta"><span class="level-status ${statusClass}">${statusText}</span><span class="level-stars">${starsHTML}</span></div>`;
+    if (unlocked) card.onclick = () => startLevel(level.id);
+    grid.appendChild(card);
+  });
+}
+
+function startLevel(levelId) {
+  const level = QUIZ_LEVELS.find(l=>l.id===levelId);
+  if (!level) return;
+  quizState.currentLevel = level;
+  quizState.score = 0; quizState.currentQ = 0; quizState.answered = false;
+  const pool = level.items();
+  const questions = []; const used = new Set();
+  const count = Math.min(level.count, pool.length);
+  for (let i=0;i<count;i++){let idx;do{idx=Math.floor(Math.random()*pool.length)}while(used.has(idx)&&used.size<pool.length);used.add(idx);questions.push(pool[idx]);}
+  quizState.questions = questions;
+  document.getElementById('quizLevelSelect').style.display = 'none';
+  document.getElementById('quizActive').style.display = 'block';
+  document.getElementById('quizComplete').style.display = 'none';
+  document.getElementById('quizLevelBadge').textContent = `Level ${level.id} — ${level.name}`;
+  document.getElementById('quizTotalQ').textContent = questions.length;
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = quizState.questions[quizState.currentQ];
+  quizState.answered = false;
+  document.getElementById('quizCurrent').textContent = quizState.currentQ+1;
+  document.getElementById('quizScore').textContent = quizState.score;
+  document.getElementById('quizProgress').style.width = `${(quizState.currentQ/quizState.questions.length)*100}%`;
+  const isWord = q.char.length > 1;
+  document.getElementById('quizPrompt').textContent = isWord?'Apa cara baca kata ini?':'Apa cara baca huruf ini?';
+  const target = document.getElementById('quizTarget');
+  target.textContent = q.char;
+  target.style.fontSize = isWord?'3rem':'5rem';
+  const allPool = QUIZ_LEVELS.flatMap(l=>l.items());
+  const correct = q.roman;
+  let options = [correct]; let attempts = 0;
+  while (options.length<4 && attempts<100){const rand=allPool[Math.floor(Math.random()*allPool.length)].roman;if(!options.includes(rand)&&rand!==correct)options.push(rand);attempts++;}
+  const fallbacks=['ga','na','da','ra','ma','ba','sa','a','eo','o','u','i','e','ae','wa','wi'];
+  let fi=0;while(options.length<4){if(!options.includes(fallbacks[fi]))options.push(fallbacks[fi]);fi++;}
+  options.sort(()=>Math.random()-.5);
+  const optContainer = document.getElementById('quizOptions'); optContainer.innerHTML = '';
+  options.forEach(opt => {
+    const btn = document.createElement('div');
+    btn.className = 'quiz-opt'; btn.textContent = opt;
+    btn.onclick = () => answerQuiz(btn,opt,correct);
+    optContainer.appendChild(btn);
+  });
+}
+
+function answerQuiz(btn,selected,correct) {
+  if (quizState.answered) return;
+  quizState.answered = true;
+  document.querySelectorAll('.quiz-opt').forEach(o=>{if(o.textContent===correct)o.classList.add('correct')});
+  if (selected===correct){quizState.score++;btn.classList.add('correct');addXP(quizState.currentLevel.xp);}
+  else btn.classList.add('wrong');
+  document.getElementById('quizScore').textContent = quizState.score;
+  setTimeout(()=>{quizState.currentQ++;if(quizState.currentQ>=quizState.questions.length)finishLevel();else renderQuestion();},1000);
+}
+
+function finishLevel() {
+  const level = quizState.currentLevel;
+  const stars = getStars(quizState.score,quizState.questions.length);
+  const pct = Math.round((quizState.score/quizState.questions.length)*100);
+  const prev = quizState.levelResults[level.id];
+  if (!prev||stars>prev.stars||(stars===prev.stars&&quizState.score>prev.score)){
+    quizState.levelResults[level.id]={score:quizState.score,total:quizState.questions.length,stars};
+    saveProgress();
+  }
+  document.getElementById('quizActive').style.display = 'none';
+  document.getElementById('quizComplete').style.display = 'block';
+  const emoji = stars===3?'🏆':stars===2?'🎉':stars===1?'👍':'😅';
+  const title = stars>=2?'Level Selesai!':stars===1?'Lulus, bisa lebih baik!':'Belum Lulus — Coba Lagi!';
+  document.getElementById('completeEmoji').textContent = emoji;
+  document.getElementById('completeTitle').textContent = title;
+  document.getElementById('completeStars').innerHTML = [1,2,3].map(i=>`<span class="${i<=stars?'filled':'empty'}">★</span>`).join('');
+  document.getElementById('completeResult').textContent = `${quizState.score}/${quizState.questions.length} benar (${pct}%) · +${quizState.score*level.xp} XP`;
+  const nextLevel = QUIZ_LEVELS.find(l=>l.id===level.id+1);
+  const btnNext = document.getElementById('btnNextLevel');
+  if (nextLevel&&stars>=1){btnNext.style.display='inline-flex';btnNext.textContent=`Level ${nextLevel.id} →`;btnNext.onclick=goToNextLevel;}
+  else if(stars>=1){btnNext.style.display='inline-flex';btnNext.textContent='🏆 Semua Selesai!';btnNext.onclick=backToLevels;}
+  else btnNext.style.display='none';
+}
+function goToNextLevel(){const n=quizState.currentLevel.id+1;if(isLevelUnlocked(n))startLevel(n);else backToLevels();}
+function retryLevel(){startLevel(quizState.currentLevel.id);}
+function backToLevels(){document.getElementById('quizLevelSelect').style.display='block';document.getElementById('quizActive').style.display='none';document.getElementById('quizComplete').style.display='none';renderLevels();}
+renderLevels();
+
+// ========== KEYBOARD ==========
+const KB_ROWS = [
+  ['ㅂ','ㅈ','ㄷ','ㄱ','ㅅ','ㅛ','ㅕ','ㅑ','ㅐ','ㅔ'],
+  ['ㅁ','ㄴ','ㅇ','ㄹ','ㅎ','ㅗ','ㅓ','ㅏ','ㅣ'],
+  ['ㅋ','ㅌ','ㅊ','ㅍ','ㅠ','ㅜ','ㅡ']
+];
+function renderKeyboard(){
+  ['kbRow1','kbRow2','kbRow3'].forEach((rid,ri)=>{
+    const row=document.getElementById(rid);row.innerHTML='';
+    KB_ROWS[ri].forEach(k=>{
+      const key=document.createElement('div');
+      key.className='kb-key';key.textContent=k;
+      key.onclick=()=>kbType(k);
+      row.appendChild(key);
+    });
+  });
+  const row4=document.getElementById('kbRow4');row4.innerHTML='';
+  [{k:' ',w:true,label:'SPACE'},{k:'.',label:'.'},{k:',',label:','},{k:'?',label:'?'},{k:'!',label:'!'}].forEach(item=>{
+    const key=document.createElement('div');
+    key.className='kb-key'+(item.w?' wide space':'');
+    key.textContent=item.label||item.k;
+    key.onclick=()=>kbType(item.k);
+    row4.appendChild(key);
+  });
+}
+let kbText='';
+function kbType(k){kbText+=k;document.getElementById('kbOutput').textContent=kbText;}
+function kbBackspace(){kbText=kbText.slice(0,-1);document.getElementById('kbOutput').textContent=kbText;}
+function kbClear(){kbText='';document.getElementById('kbOutput').textContent='';}
+function kbSpeak(){if(kbText)speakKorean(kbText);}
+renderKeyboard();
+
+// ========== PRONUNCIATION RULES ==========
+const PRON_RULES = [
+  {title:'🔄 ㄱ di depan ㄴ → jadi "ng"',desc:'Ketika ㄱ bertemu ㄴ di suku kata berikutnya, bunyi berubah menjadi "ng".',examples:[{before:'학년 → hak-nyeon',after:'학년 → hang-nyeon',note:'hak + nyeon → hangnyeon'}]},
+  {title:'🔄 ㅂ di depan ㄴ → jadi "m"',desc:'ㅂ berubah menjadi "m" jika diikuti ㄴ.',examples:[{before:'합니다 → hab-nida',after:'합니다 → ham-nida',note:'hab + nida → hamnida'}]},
+  {title:'🔄 ㄷ di depan ㄴ → jadi "n"',desc:'ㄷ berubah menjadi "n" jika diikuti ㄴ.',examples:[{before:'같은 → gat-eun',after:'같은 → gan-eun',note:'gat + eun → ganeun'}]},
+  {title:'🔄 ㅎ yang melemah/hilang',desc:'ㅎ sering hilang atau dilemahkan dalam percakapan cepat.',examples:[{before:'좋아요 → jo-ha-yo',after:'좋아요 → jo-a-yo',note:'ㅎ hampir tidak terdengar'}]},
+  {title:'🔄 Riaison (연음)',desc:'Konsonan akhir suku kata pertama pindah ke awal suku kata berikutnya jika dimulai vokal.',examples:[{before:'한국어 → han-guk-eo',after:'한국어 → han-gu-geo',note:'ㄱ dari 국 pindah ke 어'}]},
+  {title:'🔄 ㅅ di depan ㄴ → jadi "n"',desc:'ㅅ berubah menjadi "n" jika diikuti ㄴ.',examples:[{before:'있는 → iss-neun',after:'있는 → in-neun',note:'iss + neun → inneun'}]}
+];
+function renderPronRules(){
+  const c=document.getElementById('pronunciationRules');c.innerHTML='';
+  PRON_RULES.forEach(r=>{
+    const card=document.createElement('div');card.className='rule-card';
+    card.innerHTML=`<h3>${r.title}</h3><p>${r.desc}</p>${r.examples.map(ex=>`<div class="rule-example"><span class="before">${ex.before}</span><span class="arrow">→</span><span class="after">${ex.after}</span><span style="color:var(--text-sub);font-size:0.75rem;margin-left:auto">${ex.note}</span></div>`).join('')}`;
+    c.appendChild(card);
+  });
+}
+renderPronRules();
+
+// ========== SIMILAR CHARS ==========
+const SIMILAR_CHARS = [
+  {chars:['ㅂ','ㅃ','ㅍ'],roman:['B/P','PP','P'],desc:'ㅂ ringan, 烀 kuat/ganda, ㅍ aspirated (hembusan kuat)',colors:['c','d','c']},
+  {chars:['ㄱ','ㄲ','ㅋ'],roman:['G/K','KK','K'],desc:'ㄱ ringan, ㄲ kuat/ganda, ㅋ aspirated',colors:['c','d','c']},
+  {chars:['ㅅ','ㅆ'],roman:['S','SS'],desc:'ㅅ ringan, ㅆ kuat/ganda',colors:['c','d']},
+  {chars:['ㅈ','ㅉ','ㅊ'],roman:['J','JJ','CH'],desc:'ㅈ ringan, ㅉ kuat, ㅊ aspirated',colors:['c','d','c']},
+  {chars:['ㅏ','ㅓ'],roman:['A','EO'],desc:'ㅏ mulut ke kanan, ㅓ mulut ke kiri. Sering tertukar!',colors:['v','v']},
+  {chars:['ㅗ','ㅜ'],roman:['O','U'],desc:'ㅗ garis di atas, ㅜ garis di bawah. Kebalikan!',colors:['v','v']},
+  {chars:['ㅐ','ㅔ'],roman:['AE','E'],desc:'Hampir identik! Dulu beda, sekarang bunyinya sama.',colors:['cv','cv']},
+  {chars:'ㄴㅇ'.split(''),roman:['N','NG/-'],desc:'ㄴ = "n", ㅇ = diam di awal / "ng" di akhir. Jangan tertukar!',colors:['c','c']}
+];
+function renderSimilar(){
+  const c=document.getElementById('compareGrid');c.innerHTML='';
+  SIMILAR_CHARS.forEach(s=>{
+    const card=document.createElement('div');card.className='compare-card';
+    card.innerHTML=`<div class="compare-chars">${s.chars.map((ch,i)=>`<span class="compare-char c${i+1}">${ch}</span>`).join('')}</div><div style="display:flex;justify-content:center;gap:1rem;margin-bottom:0.5rem">${s.roman.map(r=>`<span style="font-size:0.8rem;font-weight:700;color:var(--text-dim)">${r}</span>`).join('')}</div><div class="compare-desc">${s.desc}</div>`;
+    c.appendChild(card);
+  });
+}
+renderSimilar();
+
+// ========== PARTICLES ==========
+const PARTICLES = [
+  {name:'은/는',usage:'Topik marker. 은 setelah konsonan, 는 setelah vokal. Menandai "tentang apa" kalimat itu.',examples:[{kr:'저는 학생이에요',meaning:'Saya adalah pelajar'},{kr:'날씨는 좋아요',meaning:'Cuacanya bagus'}]},
+  {name:'이/가',usage:'Subjek marker. 이 setelah konsonan, 가 setelah vokal. Menandai siapa/apa yang melakukan.',examples:[{kr:'비가 와요',meaning:'Hujan datang'},{kr:'고양이가 예뻐요',meaning:'Kucing itu cantik'}]},
+  {name:'을/를',usage:'Objek langsung. 을 setelah konsonan, 를 setelah vokal. Menandai apa yang dikenai aksi.',examples:[{kr:'밥을 먹어요',meaning:'Makan nasi'},{kr:'물을 마셔요',meaning:'Minum air'}]},
+  {name:'에',usage:'Lokasi/waktu. Menandai di mana atau kapan sesuatu terjadi.',examples:[{kr:'학교에 가요',meaning:'Pergi ke sekolah'},{kr:'아침에 일어나요',meaning:'Bangun di pagi hari'}]},
+  {name:'에서',usage:'Lokasi aksi. Di mana aktivitas dilakukan.',examples:[{kr:'학교에서 공부해요',meaning:'Belajar di sekolah'},{kr:'식당에서 먹어요',meaning:'Makan di restoran'}]},
+  {name:'와/과',usage:'"Dan". 와 setelah vokal, 과 setelah konsonan.',examples:[{kr:'사과와 바나나',meaning:'Apel dan pisang'},{kr:'책과 연필',meaning:'Buku dan pensil'}]},
+  {name:'의',usage:"Milik (possessive). Seperti 'punya' atau 's'.",examples:[{kr:'나의 집',meaning:'Rumahku'},{kr:'한국의 역사',meaning:'Sejarah Korea'}]}
+];
+function renderParticles(){
+  const c=document.getElementById('particleCards');c.innerHTML='';
+  PARTICLES.forEach(p=>{
+    const card=document.createElement('div');card.className='particle-card';
+    card.innerHTML=`<div class="particle-name">${p.name}</div><div class="particle-usage">${p.usage}</div>${p.examples.map(ex=>`<div class="particle-ex"><span class="kr">${ex.kr}</span> — <span class="meaning">${ex.meaning}</span></div>`).join('')}`;
+    c.appendChild(card);
+  });
+}
+renderParticles();
+
+// ========== DAILY WORD ==========
+const DAILY_WORDS = [
+  {kr:'사랑',roman:'sarang',meaning:'Cinta'},{kr:'행복',roman:'haengbok',meaning:'Bahagia'},
+  {kr:'친구',roman:'chingu',meaning:'Teman'},{kr:'꿈',roman:'kkum',meaning:'Mimpi'},
+  {kr:'바다',roman:'bada',meaning:'Laut'},{kr:'하늘',roman:'haneul',meaning:'Langit'},
+  {kr:'별',roman:'byeol',meaning:'Bintang'},{kr:'노래',roman:'norae',meaning:'Lagu'},
+  {kr:'봄',roman:'bom',meaning:'Musim semi'},{kr:'겨울',roman:'gyeoul',meaning:'Musim dingin'},
+  {kr:'여름',roman:'yeoreum',meaning:'Musim panas'},{kr:'가을',roman:'gaeul',meaning:'Musim gugur'},
+  {kr:'소망',roman:'somang',meaning:'Harapan'},{kr:'미소',roman:'miso',meaning:'Senyuman'},
+  {kr:'용기',roman:'yonggi',meaning:'Keberanian'},{kr:'평화',roman:'pyeonghwa',meaning:'Perdamaian'}
+];
+function renderDailyWord(){
+  const today = new Date();
+  const idx = (today.getFullYear()*366 + today.getMonth()*31 + today.getDate()) % DAILY_WORDS.length;
+  const w = DAILY_WORDS[idx];
+  const chars = [...w.kr];
+  let bdHTML = '';
+  chars.forEach((char,i)=>{
+    const d = decomposeSyllable(char);
+    if(d){
+      bdHTML += `<div class="bd-item init" style="min-width:35px;padding:0.3rem 0.4rem"><span class="bd-char" style="font-size:1rem">${d.initial}</span><span class="bd-label">${d.initialRoman}</span></div><span class="bd-plus" style="font-size:0.7rem">+</span><div class="bd-item med" style="min-width:35px;padding:0.3rem 0.4rem"><span class="bd-char" style="font-size:1rem">${d.medial}</span><span class="bd-label">${d.medialRoman}</span></div>`;
+      if(d.final) bdHTML += `<span class="bd-plus" style="font-size:0.7rem">+</span><div class="bd-item fin" style="min-width:35px;padding:0.3rem 0.4rem"><span class="bd-char" style="font-size:1rem">${d.final}</span><span class="bd-label">${d.finalRoman}</span></div>`;
+      if(i<chars.length-1) bdHTML += '<span class="bd-arrow" style="font-size:0.7rem">→</span>';
+    }
+  });
+  document.getElementById('dailyWord').innerHTML = `
+    <div class="dw-label">☀️ Kata Hari Ini</div>
+    <div class="dw-kr">${w.kr}</div>
+    <div class="dw-roman">${w.roman}</div>
+    <div class="dw-meaning">${w.meaning}</div>
+    <div class="dw-breakdown">${bdHTML}</div>
+    <button class="btn-sm primary dw-btn" onclick="speakKorean('${w.kr}')">🔊 Dengar</button>
+  `;
+}
+renderDailyWord();
+
+// ========== TTS ==========
+function speakKorean(text){
+  if(!('speechSynthesis' in window))return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='ko-KR';u.rate=0.8;
+  speechSynthesis.speak(u);
+}
+
+// ========== PRONUNCIATION LEARN ==========
+const PRON_CHARS = [
+  {char:'ㄱ',roman:'G/K',type:'c',correct:'기역',desc:'Seperti "g" di "go" tapi lebih ringan. Lidah menyentuh langit-langit belakang.',wrong:'가',wrongDesc:'Terdengar seperti "k" keras (bahasa Indonesia)',mouth:'Buka mulut sedikit. Lidah belakang naik menyentuh langit-langit. Suara keluar tanpa hembusan kuat.'},
+  {char:'ㅋ',roman:'K',type:'c',correct:'키읔',desc:'Seperti "k" dengan hembusan kuat (aspirated).',wrong:'카',wrongDesc:'Terdengar seperti "k" biasa tanpa hembusan',mouth:'Sama seperti ㄱ tapi dengan hembusan udara kuat dari tenggorokan. Tangan di depan mulut harus terasa anginnya.'},
+  {char:'ㄲ',roman:'KK',type:'c',correct:'쌍기역',desc:'ㄱ ganda. Tanpa hembusan, tapi ditekan kuat.',wrong:'까',wrongDesc:'Terdengar seperti ㄱ biasa',mouth:'Tegangkan otot tenggorokan. Lidah belakang menekan kuat ke langit-langit. Tidak ada hembusan udara.'},
+  {char:'ㄷ',roman:'D/T',type:'c',correct:'디귿',desc:'Seperti "d" di awal, "t" di akhir. Lidah menyentuh gusi atas.',wrong:'다',wrongDesc:'Terdengar seperti "t" keras',mouth:'Ujung lidah menyentuh gusi di belakang gigi atas. Suara keluar lembut.'},
+  {char:'ㅌ',roman:'T',type:'c',correct:'티읕',desc:'Seperti "t" dengan hembusan kuat.',wrong:'타',wrongDesc:'Terdengar seperti "t" biasa',mouth:'Sama seperti 플 tapi dengan hembusan kuat. Tangan di depan mulut terasa anginnya.'},
+  {char:'ㄸ',roman:'TT',type:'c',correct:'쌍디귿',desc:'ㄷ ganda. Ditekan kuat tanpa hembusan.',wrong:'따',wrongDesc:'Terdengar seperti ㄷ biasa',mouth:'Tegangkan tenggorokan. Lidah menekan kuat ke gusi. Tidak ada hembusan.'},
+  {char:'ㅂ',roman:'B/P',type:'c',correct:'비읍',desc:'Seperti "b" di awal, "p" di akhir. Bibir menutup rapat.',wrong:'바',wrongDesc:'Terdengar seperti "p" keras',mouth:'Bibir menutup rapat lalu terbuka. Suara keluar lembut.'},
+  {char:'ㅍ',roman:'P',type:'c',correct:'피읖',desc:'Seperti "p" dengan hembusan kuat.',wrong:'파',wrongDesc:'Terdengar seperti "p" biasa',mouth:'Bibir menutup rapat lalu terbuka dengan hembusan kuat.'},
+  {char:'ㅃ',roman:'PP',type:'c',correct:'쌍비읍',desc:'ㅂ ganda. Ditekan kuat tanpa hembusan.',wrong:'빠',wrongDesc:'Terdengar seperti ㅂ biasa',mouth:'Tegangkan bibir. Tekanan kuat tanpa hembusan udara.'},
+  {char:'ㅅ',roman:'S',type:'c',correct:'시옷',desc:'Seperti "s" Indonesia. Ujung lidah dekat gigi atas.',wrong:'사',wrongDesc:'Terdengar seperti "s" keras',mouth:'Ujung lidah mendekati gigi atas depan. Udara menyelip tipis.'},
+  {char:'ㅆ',roman:'SS',type:'c',correct:'쌍시옷',desc:'ㅅ ganda. Lebih kuat dan tajam.',wrong:'싸',wrongDesc:'Terdengar seperti ㅅ biasa',mouth:'Sama seperti ㅅ tapi lebih kuat. Lidah lebih rapat ke gigi.'},
+  {char:'ㅈ',roman:'J',type:'c',correct:'지읒',desc:'Seperti "j" di "just". Lidah menyentuh langit-langit.',wrong:'자',wrongDesc:'Terdengar seperti "ch" ringan',mouth:'Lidah menyentuh langit-langit di belakang gigi atas. Suara keluar lembut.'},
+  {char:'ㅊ',roman:'CH',type:'c',correct:'치읓',desc:'Seperti "ch" dengan hembusan kuat.',wrong:'차',wrongDesc:'Terdengar seperti "c" biasa',mouth:'Sama seperti ㅈ tapi dengan hembusan kuat dari tenggorokan.'},
+  {char:'ㅏ',roman:'A',type:'v',correct:'아',desc:'Seperti "a" di "papa". Mulut terbuka lebar ke samping.',wrong:'',wrongDesc:'',mouth:'Buka mulut lebar. Bibir merata ke samping. Lidah datar di bawah.'},
+  {char:'ㅓ',roman:'EO',type:'v',correct:'어',desc:'Seperti "o" tapi lebih terbuka. Mulut bentuk oval.',wrong:'',wrongDesc:'',mouth:'Buka mulut sedikit lebih kecil dari ㅏ. Bibir agak membulat. Lidah tengah.'},
+  {char:'ㅗ',roman:'O',type:'v',correct:'오',desc:'Seperti "o" di "go". Bibir membulat.',wrong:'',wrongDesc:'',mouth:'Bibir membulat ke depan. Mulut kecil. Lidah agak ke belakang.'},
+  {char:'ㅜ',roman:'U',type:'v',correct:'우',desc:'Seperti "u" di "buku". Bibir membulat kecil.',wrong:'',wrongDesc:'',mouth:'Bibir membulat kecil ke depan. Mulut sangat kecil. Lidah ke belakang.'},
+  {char:'ㅡ',roman:'EU',type:'v',correct:'으',desc:'Seperti "u" tapi tanpa membulatkan bibir.',wrong:'',wrongDesc:'',mouth:'Bibir terbuka horizontal (senyum tipis). Lidah datar. Suara dari tenggorokan.'},
+  {char:'ㅣ',roman:'I',type:'v',correct:'이',desc:'Seperti "i" di "ini". Bibir tersenyum.',wrong:'',wrongDesc:'',mouth:'Bibir tersenyum lebar. Lidah naik ke depan. Mulut sempit.'}
+];
+
+function renderPronLearn(){
+  const grid=document.getElementById('pronLearnGrid');grid.innerHTML='';
+  PRON_CHARS.forEach(p=>{
+    const card=document.createElement('div');card.className='pron-card';
+    let btnsHTML=`<button class="pron-play" onclick="speakChar(this,'${p.correct}')">🔊 Benar: ${p.roman}</button>`;
+    if(p.wrong) btnsHTML+=`<button class="pron-play wrong" onclick="speakChar(this,'${p.wrong}')">❌ Salah: ${p.roman}</button>`;
+    card.innerHTML=`
+      <div class="char ${p.type}">${p.char}</div>
+      <div class="roman">${p.roman}</div>
+      <div class="desc">${p.desc}</div>
+      <div class="mouth">
+        <div class="label">👄 Posisi Mulut & Lidah</div>
+        ${p.mouth}
+      </div>
+      <div class="play-btns">${btnsHTML}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+function speakChar(btn,text){
+  document.querySelectorAll('.pron-play').forEach(b=>b.classList.remove('playing'));
+  btn.classList.add('playing');
+  if(!('speechSynthesis' in window))return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='ko-KR';u.rate=0.7;
+  u.onend=()=>btn.classList.remove('playing');
+  speechSynthesis.speak(u);
+}
+renderPronLearn();
+
+// ========== WRITING CANVAS ==========
+const WRITE_CHARS = [
+  {char:'ㄱ',name:'기역',strokes:'1 goresan: kiri → kanan',guide:'Garis horizontal dari kiri ke kanan. Seperti huruf L terbalik tanpa garis vertikal.',ref:[{type:'h',x:50,y:150,len:200}]},
+  {char:'ㄴ',name:'니은',strokes:'2 goresan: atas → bawah, lalu kiri → kanan',guide:'Garis vertikal dari atas ke bawah, lalu belok kanan. Seperti huruf L.',ref:[{type:'v',x:80,y:50,len:200},{type:'h',x:80,y:250,len:170}]},
+  {char:'ㄷ',name:'디귿',strokes:'3 goresan: horizontal, vertikal, horizontal',guide:'Garis atas horizontal, lalu vertikal ke bawah, lalu horizontal ke kanan. Seperti huruf C terbalik.',ref:[{type:'h',x:70,y:50,len:160},{type:'v',x:70,y:50,len:200},{type:'h',x:70,y:250,len:160}]},
+  {char:'ㄹ',name:'리을',strokes:'5 goresan',guide:'Seperti angka 5. Horizontal, vertikal, horizontal, vertikal ke bawah, horizontal.',ref:[{type:'h',x:60,y:50,len:180},{type:'v',x:240,y:50,len:100},{type:'h',x:60,y:150,len:180},{type:'v',x:60,y:150,len:100},{type:'h',x:60,y:250,len:180}]},
+  {char:'ㅁ',name:'미음',strokes:'4 goresan',guide:'Kotak. Vertikal kiri, horizontal atas, vertikal kanan, horizontal bawah.',ref:[{type:'v',x:70,y:50,len:200},{type:'h',x:70,y:50,len:160},{type:'v',x:230,y:50,len:200},{type:'h',x:70,y:250,len:160}]},
+  {char:'ㅂ',name:'비읍',strokes:'4 goresan',guide:'Vertikal kiri, vertikal kanan, horizontal tengah, horizontal bawah. Seperti dua garis vertikal dijembatani.',ref:[{type:'v',x:70,y:50,len:200},{type:'v',x:230,y:50,len:200},{type:'h',x:70,y:150,len:160},{type:'h',x:70,y:250,len:160}]},
+  {char:'ㅅ',name:'시옷',strokes:'2 goresan',guide:'Seperti segitiga. Garis diagonal kiri atas ke bawah tengah, lalu diagonal kanan atas ke bawah tengah.',ref:[{type:'d',x:150,y:50,x2:70,y2:250},{type:'d',x:150,y:50,x2:230,y2:250}]},
+  {char:'ㅇ',name:'이응',strokes:'1 goresan (lingkaran)',guide:'Lingkaran. Mulai dari atas, putar searah jarum jam.',ref:[{type:'circle',cx:150,cy:150,r:100}]},
+  {char:'ㅏ',name:'아',strokes:'2 goresan',guide:'Garis vertikal dari atas ke bawah, lalu garis horizontal pendek ke kanan di tengah.',ref:[{type:'v',x:120,y:30,len:240},{type:'h',x:120,y:150,len:100}]},
+  {char:'ㅓ',name:'어',strokes:'2 goresan',guide:'Garis vertikal dari atas ke bawah, lalu garis horizontal pendek ke KIRI di tengah.',ref:[{type:'v',x:180,y:30,len:240},{type:'h',x:80,y:150,len:100}]},
+  {char:'ㅗ',name:'오',strokes:'2 goresan',guide:'Garis horizontal dari kiri ke kanan di tengah, lalu garis vertikal pendek ke BAWAH di tengah.',ref:[{type:'h',x:50,y:130,len:200},{type:'v',x:150,y:130,len:100}]},
+  {char:'ㅜ',name:'우',strokes:'2 goresan',guide:'Garis horizontal dari kiri ke kanan di tengah, lalu garis vertikal pendek ke ATAS di tengah.',ref:[{type:'h',x:50,y:170,len:200},{type:'v',x:150,y:70,len:100}]},
+  {char:'ㅎ',name:'히읗',strokes:'3 goresan',guide:'Horizontal atas, lingkaran kecil di bawah, lalu vertikal ke bawah menembus lingkaran.',ref:[{type:'h',x:60,y:50,len:180},{type:'circle',cx:150,cy:150,r:60},{type:'v',x:150,y:150,len:100}]}
+];
+
+let currentWriteChar = 0;
+let isDrawing = false;
+let drawPoints = [];
+let canvasCtx = null;
+
+function initCanvas(){
+  const canvas = document.getElementById('writeCanvas');
+  canvasCtx = canvas.getContext('2d');
+  canvasCtx.lineWidth = 8;
+  canvasCtx.lineCap = 'round';
+  canvasCtx.lineJoin = 'round';
+  canvasCtx.strokeStyle = '#34D399';
+
+  canvas.addEventListener('mousedown', startDraw);
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('mouseup', endDraw);
+  canvas.addEventListener('mouseleave', endDraw);
+  canvas.addEventListener('touchstart', e=>{e.preventDefault();startDraw(getTouchPos(e));}, {passive:false});
+  canvas.addEventListener('touchmove', e=>{e.preventDefault();draw(getTouchPos(e));}, {passive:false});
+  canvas.addEventListener('touchend', endDraw);
+}
+
+function getTouchPos(e){
+  const canvas = document.getElementById('writeCanvas');
+  const rect = canvas.getBoundingClientRect();
+  const touch = e.touches[0];
+  return {
+    offsetX: (touch.clientX - rect.left) * (canvas.width / rect.width),
+    offsetY: (touch.clientY - rect.top) * (canvas.height / rect.height)
+  };
+}
+
+function startDraw(e){
+  isDrawing = true;
+  const x = e.offsetX !== undefined ? e.offsetX : e.offsetX;
+  const y = e.offsetY !== undefined ? e.offsetY : e.offsetY;
+  canvasCtx.beginPath();
+  canvasCtx.moveTo(x, y);
+  drawPoints.push({x, y});
+}
+
+function draw(e){
+  if(!isDrawing) return;
+  const x = e.offsetX !== undefined ? e.offsetX : e.offsetX;
+  const y = e.offsetY !== undefined ? e.offsetY : e.offsetY;
+  canvasCtx.lineTo(x, y);
+  canvasCtx.stroke();
+  drawPoints.push({x, y});
+}
+
+function endDraw(){
+  isDrawing = false;
+  if(drawPoints.length > 0) drawPoints.push({end:true});
+}
+
+function clearCanvas(){
+  const canvas = document.getElementById('writeCanvas');
+  canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+  drawPoints = [];
+  document.getElementById('writeResult').innerHTML = '';
+  document.getElementById('writeResult').className = 'write-result';
+  document.getElementById('writeProgressFill').style.width = '0%';
+  document.getElementById('writeProgressFill').style.background = 'var(--border)';
+  document.getElementById('writeAccuracyText').textContent = '-';
+}
+
+function checkWriting(){
+  if(drawPoints.length < 10){
+    showWriteResult('Tulis dulu hurufnya! Tidak cukup goresan.', false, 0);
+    return;
+  }
+
+  const char = WRITE_CHARS[currentWriteChar];
+  const canvas = document.getElementById('writeCanvas');
+  const w = canvas.width, h = canvas.height;
+
+  // Get bounding box of user drawing
+  const pts = drawPoints.filter(p=>!p.end);
+  const minX = Math.min(...pts.map(p=>p.x)), maxX = Math.max(...pts.map(p=>p.x));
+  const minY = Math.min(...pts.map(p=>p.y)), maxY = Math.max(...pts.map(p=>p.y));
+  const userW = maxX - minX || 1, userH = maxY - minY || 1;
+  const userCX = (minX + maxX)/2, userCY = (minY + maxY)/2;
+
+  // Generate reference points for comparison
+  const refPoints = generateRefPoints(char.ref, w, h);
+  if(refPoints.length === 0){
+    showWriteResult('Karakter ini belum punya referensi. Coba karakter lain.', false, 0);
+    return;
+  }
+
+  // Normalize both to 0-1 range and compare coverage
+  const gridSize = 20;
+  const userGrid = new Set();
+  const refGrid = new Set();
+
+  pts.forEach(p => {
+    const gx = Math.floor(((p.x - minX) / userW) * gridSize);
+    const gy = Math.floor(((p.y - minY) / userH) * gridSize);
+    userGrid.add(`${gx},${gy}`);
+  });
+
+  const refMinX = Math.min(...refPoints.map(p=>p.x)), refMaxX = Math.max(...refPoints.map(p=>p.x));
+  const refMinY = Math.min(...refPoints.map(p=>p.y)), refMaxY = Math.max(...refPoints.map(p=>p.y));
+  const refW = refMaxX - refMinX || 1, refH = refMaxY - refMinY || 1;
+
+  refPoints.forEach(p => {
+    const gx = Math.floor(((p.x - refMinX) / refW) * gridSize);
+    const gy = Math.floor(((p.y - refMinY) / refH) * gridSize);
+    refGrid.add(`${gx},${gy}`);
+  });
+
+  // Calculate overlap
+  let matchCount = 0;
+  refGrid.forEach(key => {
+    if(userGrid.has(key)) matchCount++;
+  });
+
+  const accuracy = refGrid.size > 0 ? Math.round((matchCount / refGrid.size) * 100) : 0;
+  const passed = accuracy >= 60;
+
+  showWriteResult(
+    passed ? `Bagus! Akurasi ${accuracy}% — Goresan sudah mirip!` : `Akurasi ${accuracy}% — Coba lagi, ikuti pola garis panduan.`,
+    passed,
+    accuracy
+  );
+}
+
+function generateRefPoints(refs, w, h){
+  const points = [];
+  refs.forEach(r => {
+    if(r.type === 'h'){
+      for(let i=0;i<=30;i++) points.push({x:r.x+(r.len*i/30), y:r.y});
+    } else if(r.type === 'v'){
+      for(let i=0;i<=30;i++) points.push({x:r.x, y:r.y+(r.len*i/30)});
+    } else if(r.type === 'd'){
+      for(let i=0;i<=30;i++) points.push({x:r.x+((r.x2-r.x)*i/30), y:r.y+((r.y2-r.y)*i/30)});
+    } else if(r.type === 'circle'){
+      for(let i=0;i<=60;i++){
+        const angle = (i/60)*Math.PI*2;
+        points.push({x:r.cx+Math.cos(angle)*r.r, y:r.cy+Math.sin(angle)*r.r});
+      }
+    }
+  });
+  return points;
+}
+
+function showWriteResult(text, passed, accuracy){
+  const el = document.getElementById('writeResult');
+  el.textContent = text;
+  el.className = 'write-result ' + (passed ? 'pass' : 'fail');
+  const fill = document.getElementById('writeProgressFill');
+  fill.style.width = accuracy + '%';
+  fill.style.background = passed ? 'var(--emerald)' : 'var(--rose)';
+  document.getElementById('writeAccuracyText').textContent = accuracy + '%';
+  document.getElementById('writeAccuracyText').style.color = passed ? 'var(--emerald)' : 'var(--rose)';
+  if(passed) addXP(5);
+}
+
+function selectWriteChar(idx){
+  currentWriteChar = idx;
+  const char = WRITE_CHARS[idx];
+  document.getElementById('writeRefChar').textContent = char.char;
+  document.getElementById('writeInfoChar').textContent = char.char;
+  document.getElementById('writeInfoName').textContent = char.name;
+  document.getElementById('writeInfoStroke').textContent = char.strokes;
+  document.getElementById('writeStrokeGuide').textContent = char.guide;
+  document.querySelectorAll('.write-char-btn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  clearCanvas();
+}
+
+function showNextWriteChar(){
+  selectWriteChar((currentWriteChar + 1) % WRITE_CHARS.length);
+}
+
+function renderWriteSelector(){
+  const c = document.getElementById('writeCharSelector');c.innerHTML='';
+  WRITE_CHARS.forEach((w,i)=>{
+    const btn = document.createElement('div');
+    btn.className = 'write-char-btn' + (i===0?' active':'');
+    btn.textContent = w.char;
+    btn.onclick = () => selectWriteChar(i);
+    c.appendChild(btn);
+  });
+}
+renderWriteSelector();
+selectWriteChar(0);
+setTimeout(initCanvas, 100);
+
+// ========== AUDIO FOR PRONUNCIATION RULES ==========
+const originalRenderPronRules = renderPronRules;
+renderPronRules = function(){
+  const c=document.getElementById('pronunciationRules');c.innerHTML='';
+  PRON_RULES.forEach(r=>{
+    const card=document.createElement('div');card.className='rule-card';
+    const exHTML = r.examples.map(ex=>`
+      <div class="rule-example">
+        <span class="before">${ex.before}</span>
+        <span class="arrow">→</span>
+        <span class="after">${ex.after}</span>
+        <span style="color:var(--text-sub);font-size:0.75rem;margin-left:auto">${ex.note}</span>
+        <button class="pron-play" style="margin-left:0.5rem" onclick="speakRuleExample(this,${JSON.stringify(ex.before.split('→')[0].trim().split(' ')[0])},${JSON.stringify(ex.after.split('→')[1].trim().split(' ')[0])})">🔊</button>
+      </div>
+    `).join('');
+    card.innerHTML=`<h3>${r.title}</h3><p>${r.desc}</p>${exHTML}`;
+    c.appendChild(card);
+  });
+};
+renderPronRules();
+
+function speakRuleExample(btn, wrong, correct){
+  document.querySelectorAll('.pron-play').forEach(b=>b.classList.remove('playing'));
+  btn.classList.add('playing');
+  if(!('speechSynthesis' in window))return;
+  speechSynthesis.cancel();
+  // Speak wrong version then correct
+  const u1 = new SpeechSynthesisUtterance(wrong);
+  u1.lang='ko-KR';u1.rate=0.7;
+  const u2 = new SpeechSynthesisUtterance(correct);
+  u2.lang='ko-KR';u2.rate=0.7;
+  u2.onend=()=>btn.classList.remove('playing');
+  u1.onend=()=>speechSynthesis.speak(u2);
+  speechSynthesis.speak(u1);
+}
+
+// ========== XP ==========
+let totalXP = 0;
+function addXP(amount){
+  totalXP += amount;
+  document.getElementById('totalXPFooter').textContent = `⚡ ${totalXP} XP`;
+}
+
+// ========== PWA ==========
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>

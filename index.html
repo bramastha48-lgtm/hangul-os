@@ -470,8 +470,9 @@ h3{font-size:1.05rem;font-weight:600;margin-bottom:0.4rem}
   position:relative;width:300px;height:300px;
   border:2px solid var(--border);border-radius:var(--radius);
   background:var(--bg2);overflow:hidden;
+  touch-action:none;
 }
-.write-canvas-wrap canvas{position:absolute;top:0;left:0;width:100%;height:100%;cursor:crosshair}
+.write-canvas-wrap canvas{position:absolute;top:0;left:0;width:100%;height:100%;cursor:crosshair;touch-action:none}
 .write-ref-char{
   position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
   font-family:'Noto Sans KR',sans-serif;font-size:200px;font-weight:500;

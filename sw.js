@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hangul-os-v1';
+const CACHE_NAME = 'hangul-os-v2';
 const ASSETS = [
   './',
   './index.html',

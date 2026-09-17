@@ -710,17 +710,21 @@ h3{font-size:1.05rem;font-weight:600;margin-bottom:0.4rem}
 <div class="page" id="page-builder">
   <div class="page-label">// Syllable Constructor</div>
   <h2>🧩 Suku Kata</h2>
-  <p class="subtitle" style="margin-bottom:1.5rem">Pilih konsonan lalu vokal untuk membentuk blok suku kata.</p>
+  <p class="subtitle" style="margin-bottom:1.5rem">Pilih konsonan awal + vokal + konsonan akhir (opsional) untuk membentuk blok suku kata Korea.</p>
   <div class="card">
     <div class="builder-area">
       <div class="builder-slots">
         <div class="builder-preview" id="builderPreview">?</div>
         <div class="slot-row">
-          <div class="slot active" id="slotC" onclick="activateSlot('C')"><span id="slotCVal"></span><span class="slot-label">Konsonan</span></div>
-          <div class="slot" id="slotV" onclick="activateSlot('V')"><span id="slotVVal"></span><span class="slot-label">Vokal</span></div>
+          <div class="slot active" id="slotC" onclick="activateSlot('C')"><span id="slotCVal"></span><span class="slot-label">初 (Konsonan Awal)</span></div>
+          <div class="slot" id="slotV" onclick="activateSlot('V')"><span id="slotVVal"></span><span class="slot-label">中 (Vokal)</span></div>
+          <div class="slot" id="slotF" onclick="activateSlot('F')"><span id="slotFVal"></span><span class="slot-label">終 (Konsonan Akhir)</span></div>
         </div>
         <div style="display:flex;gap:0.5rem;margin-top:1.5rem">
           <button class="btn-sm" onclick="clearBuilder()">↺ Reset</button>
+        </div>
+        <div style="margin-top:1rem;font-size:0.75rem;color:var(--text-dim);line-height:1.6">
+          <strong>Contoh:</strong> ㅎ+ㅏ+ㄴ = <strong>한</strong> (han) &nbsp;|&nbsp; ㅂ+ㅏ+ㅂ = <strong>밥</strong> (bap/nasi) &nbsp;|&nbsp; ㅇ+ㅏ = <strong>아</strong> (a)
         </div>
       </div>
       <div class="builder-picker">
@@ -982,43 +986,137 @@ const VOCAB = {
 
 // ========== TRANSLATE DATABASE ==========
 const TRANSLATE_DB = [
+  // Transportasi
   {kr:'차',meaning:'Mobil',cat:'🚌 Transportasi'},{kr:'버스',meaning:'Bus',cat:'🚌 Transportasi'},
   {kr:'택시',meaning:'Taksi',cat:'🚌 Transportasi'},{kr:'기차',meaning:'Kereta',cat:'🚌 Transportasi'},
   {kr:'비행기',meaning:'Pesawat',cat:'🚌 Transportasi'},{kr:'자전거',meaning:'Sepeda',cat:'🚌 Transportasi'},
+  {kr:'배',meaning:'Kapal',cat:'🚌 Transportasi'},{kr:'지하철',meaning:'Kereta bawah tanah',cat:'🚌 Transportasi'},
+  {kr:'오토바이',meaning:'Motor',cat:'🚌 Transportasi'},{kr:'트럭',meaning:'Truk',cat:'🚌 Transportasi'},
+  // Tempat
   {kr:'학교',meaning:'Sekolah',cat:'📚 Tempat'},{kr:'집',meaning:'Rumah',cat:'📚 Tempat'},
   {kr:'병원',meaning:'Rumah sakit',cat:'📚 Tempat'},{kr:'가게',meaning:'Toko',cat:'📚 Tempat'},
   {kr:'식당',meaning:'Restoran',cat:'📚 Tempat'},{kr:'은행',meaning:'Bank',cat:'📚 Tempat'},
+  {kr:'공원',meaning:'Taman',cat:'📚 Tempat'},{kr:'도서관',meaning:'Perpustakaan',cat:'📚 Tempat'},
+  {kr:'시장',meaning:'Pasar',cat:'📚 Tempat'},{kr:'카페',meaning:'Kafe',cat:'📚 Tempat'},
+  {kr:'영화관',meaning:'Bioskop',cat:'📚 Tempat'},{kr:'교회',meaning:'Gereja',cat:'📚 Tempat'},
+  {kr:'사무실',meaning:'Kantor',cat:'📚 Tempat'},{kr:'화장실',meaning:'Toilet',cat:'📚 Tempat'},
+  {kr:'공항',meaning:'Bandara',cat:'📚 Tempat'},{kr:'호텔',meaning:'Hotel',cat:'📚 Tempat'},
+  {kr:'약국',meaning:'Apotek',cat:'📚 Tempat'},{kr:'서점',meaning:'Toko buku',cat:'📚 Tempat'},
+  // Makanan
   {kr:'밥',meaning:'Nasi',cat:'🍚 Makanan'},{kr:'물',meaning:'Air',cat:'🍚 Makanan'},
   {kr:'고기',meaning:'Daging',cat:'🍚 Makanan'},{kr:'빵',meaning:'Roti',cat:'🍚 Makanan'},
   {kr:'커피',meaning:'Kopi',cat:'🍚 Makanan'},{kr:'김치',meaning:'Kimchi',cat:'🍚 Makanan'},
   {kr:'라면',meaning:'Ramen',cat:'🍚 Makanan'},{kr:'치킨',meaning:'Ayam goreng',cat:'🍚 Makanan'},
   {kr:'피자',meaning:'Pizza',cat:'🍚 Makanan'},{kr:'사과',meaning:'Apel',cat:'🍚 Makanan'},
   {kr:'수박',meaning:'Semangka',cat:'🍚 Makanan'},{kr:'과일',meaning:'Buah',cat:'🍚 Makanan'},
+  {kr:'채소',meaning:'Sayur',cat:'🍚 Makanan'},{kr:'생선',meaning:'Ikan (makanan)',cat:'🍚 Makanan'},
+  {kr:'계란',meaning:'Telur',cat:'🍚 Makanan'},{kr:'우유',meaning:'Susu',cat:'🍚 Makanan'},
+  {kr:'주스',meaning:'Jus',cat:'🍚 Makanan'},{kr:'맥주',meaning:'Bir',cat:'🍚 Makanan'},
+  {kr:'소주',meaning:'Soju',cat:'🍚 Makanan'},{kr:'떡',meaning:'Kue beras',cat:'🍚 Makanan'},
+  {kr:'국',meaning:'Sup',cat:'🍚 Makanan'},{kr:'반찬',meaning:'Lauk pauk',cat:'🍚 Makanan'},
+  {kr:'삼겹살',meaning:'Daging babi panggang',cat:'🍚 Makanan'},{kr:'비빔밥',meaning:'Nasi campur Korea',cat:'🍚 Makanan'},
+  {kr:'불고기',meaning:'Daging sapi panggang',cat:'🍚 Makanan'},{kr:'떡볶이',meaning:'Kue beras pedas',cat:'🍚 Makanan'},
+  {kr:'김밥',meaning:'Nasi gulung rumput laut',cat:'🍚 Makanan'},{kr:'만두',meaning:'Pangsit',cat:'🍚 Makanan'},
+  // Orang
   {kr:'사람',meaning:'Orang',cat:'👤 Orang'},{kr:'친구',meaning:'Teman',cat:'👤 Orang'},
   {kr:'선생님',meaning:'Guru',cat:'👤 Orang'},{kr:'학생',meaning:'Pelajar',cat:'👤 Orang'},
   {kr:'의사',meaning:'Dokter',cat:'👤 Orang'},{kr:'이름',meaning:'Nama',cat:'👤 Orang'},
+  {kr:'남자',meaning:'Pria',cat:'👤 Orang'},{kr:'여자',meaning:'Wanita',cat:'👤 Orang'},
+  {kr:'아이',meaning:'Anak',cat:'👤 Orang'},{kr:'아기',meaning:'Bayi',cat:'👤 Orang'},
+  {kr:'어른',meaning:'Orang dewasa',cat:'👤 Orang'},{kr:'형제',meaning:'Saudara laki-laki',cat:'👤 Orang'},
+  {kr:'자매',meaning:'Saudara perempuan',cat:'👤 Orang'},{kr:'부모',meaning:'Orang tua',cat:'👤 Orang'},
+  {kr:'할아버지',meaning:'Kakek',cat:'👤 Orang'},{kr:'할머니',meaning:'Nenek',cat:'👤 Orang'},
+  // Alam
   {kr:'하늘',meaning:'Langit',cat:'🌍 Alam'},{kr:'바다',meaning:'Laut',cat:'🌍 Alam'},
   {kr:'산',meaning:'Gunung',cat:'🌍 Alam'},{kr:'나무',meaning:'Pohon',cat:'🌍 Alam'},
   {kr:'꽃',meaning:'Bunga',cat:'🌍 Alam'},{kr:'강',meaning:'Sungai',cat:'🌍 Alam'},
+  {kr:'비',meaning:'Hujan',cat:'🌍 Alam'},{kr:'눈',meaning:'Salju/mata',cat:'🌍 Alam'},
+  {kr:'바람',meaning:'Angin',cat:'🌍 Alam'},{kr:'해',meaning:'Matahari',cat:'🌍 Alam'},
+  {kr:'달',meaning:'Bulan',cat:'🌍 Alam'},{kr:'별',meaning:'Bintang',cat:'🌍 Alam'},
+  {kr:'땅',meaning:'Tanah',cat:'🌍 Alam'},{kr:'숲',meaning:'Hutan',cat:'🌍 Alam'},
+  // Hewan
   {kr:'개',meaning:'Anjing',cat:'🐶 Hewan'},{kr:'고양이',meaning:'Kucing',cat:'🐶 Hewan'},
   {kr:'새',meaning:'Burung',cat:'🐶 Hewan'},{kr:'물고기',meaning:'Ikan',cat:'🐶 Hewan'},
   {kr:'돼지',meaning:'Babi',cat:'🐶 Hewan'},{kr:'원숭이',meaning:'Monyet',cat:'🐶 Hewan'},
+  {kr:'닭',meaning:'Ayam',cat:'🐶 Hewan'},{kr:'소',meaning:'Sapi',cat:'🐶 Hewan'},
+  {kr:'말',meaning:'Kuda',cat:'🐶 Hewan'},{kr:'토끼',meaning:'Kelinci',cat:'🐶 Hewan'},
+  {kr:'뱀',meaning:'Ular',cat:'🐶 Hewan'},{kr:'거북이',meaning:'Kura-kura',cat:'🐶 Hewan'},
+  // Kata Sifat
   {kr:'크다',meaning:'Besar',cat:'📝 Kata Sifat'},{kr:'작다',meaning:'Kecil',cat:'📝 Kata Sifat'},
   {kr:'좋다',meaning:'Baik/bagus',cat:'📝 Kata Sifat'},{kr:'나쁘다',meaning:'Buruk',cat:'📝 Kata Sifat'},
   {kr:'예쁘다',meaning:'Cantik',cat:'📝 Kata Sifat'},{kr:'덥다',meaning:'Panas',cat:'📝 Kata Sifat'},
   {kr:'춥다',meaning:'Dingin',cat:'📝 Kata Sifat'},{kr:'빠르다',meaning:'Cepat',cat:'📝 Kata Sifat'},
+  {kr:'느리다',meaning:'Lambat',cat:'📝 Kata Sifat'},{kr:'높다',meaning:'Tinggi',cat:'📝 Kata Sifat'},
+  {kr:'낮다',meaning:'Rendah',cat:'📝 Kata Sifat'},{kr:'많다',meaning:'Banyak',cat:'📝 Kata Sifat'},
+  {kr:'적다',meaning:'Sedikit',cat:'📝 Kata Sifat'},{kr:'길다',meaning:'Panjang',cat:'📝 Kata Sifat'},
+  {kr:'짧다',meaning:'Pendek',cat:'📝 Kata Sifat'},{kr:'무겁다',meaning:'Berat',cat:'📝 Kata Sifat'},
+  {kr:'가볍다',meaning:'Ringan',cat:'📝 Kata Sifat'},{kr:'밝다',meaning:'Terang',cat:'📝 Kata Sifat'},
+  {kr:'어둡다',meaning:'Gelap',cat:'📝 Kata Sifat'},{kr:'맛있다',meaning:'Enak',cat:'📝 Kata Sifat'},
+  {kr:'맛없다',meaning:'Tidak enak',cat:'📝 Kata Sifat'},{kr:'아름답다',meaning:'Indah',cat:'📝 Kata Sifat'},
+  // Kata Kerja
   {kr:'먹다',meaning:'Makan',cat:'✏️ Kata Kerja'},{kr:'마시다',meaning:'Minum',cat:'✏️ Kata Kerja'},
   {kr:'가다',meaning:'Pergi',cat:'✏️ Kata Kerja'},{kr:'오다',meaning:'Datang',cat:'✏️ Kata Kerja'},
   {kr:'보다',meaning:'Melihat',cat:'✏️ Kata Kerja'},{kr:'듣다',meaning:'Mendengar',cat:'✏️ Kata Kerja'},
   {kr:'말하다',meaning:'Bicara',cat:'✏️ Kata Kerja'},{kr:'읽다',meaning:'Membaca',cat:'✏️ Kata Kerja'},
   {kr:'쓰다',meaning:'Menulis',cat:'✏️ Kata Kerja'},{kr:'자다',meaning:'Tidur',cat:'✏️ Kata Kerja'},
+  {kr:'앉다',meaning:'Duduk',cat:'✏️ Kata Kerja'},{kr:'서다',meaning:'Berdiri',cat:'✏️ Kata Kerja'},
+  {kr:'달리다',meaning:'Berlari',cat:'✏️ Kata Kerja'},{kr:'걷다',meaning:'Berjalan',cat:'✏️ Kata Kerja'},
+  {kr:'주다',meaning:'Memberi',cat:'✏️ Kata Kerja'},{kr:'받다',meaning:'Menerima',cat:'✏️ Kata Kerja'},
+  {kr:'사다',meaning:'Membeli',cat:'✏️ Kata Kerja'},{kr:'팔다',meaning:'Menjual',cat:'✏️ Kata Kerja'},
+  {kr:'배우다',meaning:'Belajar',cat:'✏️ Kata Kerja'},{kr:'가르치다',meaning:'Mengajar',cat:'✏️ Kata Kerja'},
+  {kr:'일하다',meaning:'Bekerja',cat:'✏️ Kata Kerja'},{kr:'놀다',meaning:'Bermain',cat:'✏️ Kata Kerja'},
+  {kr:'요리하다',meaning:'Memasak',cat:'✏️ Kata Kerja'},{kr:'청소하다',meaning:'Membersihkan',cat:'✏️ Kata Kerja'},
+  {kr:'운동하다',meaning:'Olahraga',cat:'✏️ Kata Kerja'},{kr:'전화하다',meaning:'Menelepon',cat:'✏️ Kata Kerja'},
+  {kr:'만나다',meaning:'Bertemu',cat:'✏️ Kata Kerja'},{kr:'기다리다',meaning:'Menunggu',cat:'✏️ Kata Kerja'},
+  {kr:'생각하다',meaning:'Berpikir',cat:'✏️ Kata Kerja'},{kr:'알다',meaning:'Tahu',cat:'✏️ Kata Kerja'},
+  {kr:'모르다',meaning:'Tidak tahu',cat:'✏️ Kata Kerja'},{kr:'좋아하다',meaning:'Menyukai',cat:'✏️ Kata Kerja'},
+  {kr:'싫어하다',meaning:'Tidak suka',cat:'✏️ Kata Kerja'},{kr:'사랑하다',meaning:'Mencintai',cat:'✏️ Kata Kerja'},
+  // Angka
   {kr:'하나',meaning:'Satu',cat:'🔢 Angka'},{kr:'둘',meaning:'Dua',cat:'🔢 Angka'},
   {kr:'셋',meaning:'Tiga',cat:'🔢 Angka'},{kr:'넷',meaning:'Empat',cat:'🔢 Angka'},
-  {kr:'다섯',meaning:'Lima',cat:'🔢 Angka'},{kr:'열',meaning:'Sepuluh',cat:'🔢 Angka'},
+  {kr:'다섯',meaning:'Lima',cat:'🔢 Angka'},{kr:'여섯',meaning:'Enam',cat:'🔢 Angka'},
+  {kr:'일곱',meaning:'Tujuh',cat:'🔢 Angka'},{kr:'여덟',meaning:'Delapan',cat:'🔢 Angka'},
+  {kr:'아홉',meaning:'Sembilan',cat:'🔢 Angka'},{kr:'열',meaning:'Sepuluh',cat:'🔢 Angka'},
+  {kr:'스물',meaning:'Dua puluh',cat:'🔢 Angka'},{kr:'서른',meaning:'Tiga puluh',cat:'🔢 Angka'},
   {kr:'백',meaning:'Seratus',cat:'🔢 Angka'},{kr:'천',meaning:'Seribu',cat:'🔢 Angka'},
+  {kr:'만',meaning:'Sepuluh ribu',cat:'🔢 Angka'},{kr:'영',meaning:'Nol',cat:'🔢 Angka'},
+  // Keluarga
   {kr:'엄마',meaning:'Ibu',cat:'👨‍👩‍👧 Keluarga'},{kr:'아빠',meaning:'Ayah',cat:'👨‍👩‍👧 Keluarga'},
   {kr:'형',meaning:'Kakak laki-laki',cat:'👨‍👩‍👧 Keluarga'},{kr:'누나',meaning:'Kakak perempuan',cat:'👨‍👩‍👧 Keluarga'},
-  {kr:'오빠',meaning:'Kakak laki-laki (wanita)',cat:'👨‍👩‍👧 Keluarga'},{kr:'언니',meaning:'Kakak perempuan (wanita)',cat:'👨‍👩‍👧 Keluarga'}
+  {kr:'오빠',meaning:'Kakak laki-laki (wanita)',cat:'👨‍👩‍👧 Keluarga'},{kr:'언니',meaning:'Kakak perempuan (wanita)',cat:'👨‍👩‍👧 Keluarga'},
+  {kr:'동생',meaning:'Adik',cat:'👨‍👩‍👧 Keluarga'},{kr:'아들',meaning:'Anak laki-laki',cat:'👨‍👩‍👧 Keluarga'},
+  {kr:'딸',meaning:'Anak perempuan',cat:'👨‍👩‍👧 Keluarga'},{kr:'남편',meaning:'Suami',cat:'👨‍👩‍👧 Keluarga'},
+  {kr:'아내',meaning:'Istri',cat:'👨‍👩‍👧 Keluarga'},{kr:'가족',meaning:'Keluarga',cat:'👨‍👩‍👧 Keluarga'},
+  // Warna
+  {kr:'빨간색',meaning:'Merah',cat:'🎨 Warna'},{kr:'파란색',meaning:'Biru',cat:'🎨 Warna'},
+  {kr:'노란색',meaning:'Kuning',cat:'🎨 Warna'},{kr:'초록색',meaning:'Hijau',cat:'🎨 Warna'},
+  {kr:'하얀색',meaning:'Putih',cat:'🎨 Warna'},{kr:'검은색',meaning:'Hitam',cat:'🎨 Warna'},
+  {kr:'주황색',meaning:'Oranye',cat:'🎨 Warna'},{kr:'보라색',meaning:'Ungu',cat:'🎨 Warna'},
+  {kr:'분홍색',meaning:'Merah muda',cat:'🎨 Warna'},{kr:'갈색',meaning:'Cokelat',cat:'🎨 Warna'},
+  // Pakaian
+  {kr:'옷',meaning:'Pakaian',cat:'👕 Pakaian'},{kr:'바지',meaning:'Celana',cat:'👕 Pakaian'},
+  {kr:'치마',meaning:'Rok',cat:'👕 Pakaian'},{kr:'셔츠',meaning:'Kemeja',cat:'👕 Pakaian'},
+  {kr:'신발',meaning:'Sepatu',cat:'👕 Pakaian'},{kr:'모자',meaning:'Topi',cat:'👕 Pakaian'},
+  {kr:'가방',meaning:'Tas',cat:'👕 Pakaian'},{kr:'안경',meaning:'Kacamata',cat:'👕 Pakaian'},
+  // Waktu
+  {kr:'오늘',meaning:'Hari ini',cat:'⏰ Waktu'},{kr:'내일',meaning:'Besok',cat:'⏰ Waktu'},
+  {kr:'어제',meaning:'Kemarin',cat:'⏰ Waktu'},{kr:'아침',meaning:'Pagi',cat:'⏰ Waktu'},
+  {kr:'점심',meaning:'Siang',cat:'⏰ Waktu'},{kr:'저녁',meaning:'Sore/malam',cat:'⏰ Waktu'},
+  {kr:'지금',meaning:'Sekarang',cat:'⏰ Waktu'},{kr:'나중',meaning:'Nanti',cat:'⏰ Waktu'},
+  {kr:'항상',meaning:'Selalu',cat:'⏰ Waktu'},{kr:'가끔',meaning:'Kadang-kadang',cat:'⏰ Waktu'},
+  // Tubuh
+  {kr:'머리',meaning:'Kepala',cat:'🧍 Tubuh'},{kr:'눈',meaning:'Mata',cat:'🧍 Tubuh'},
+  {kr:'코',meaning:'Hidung',cat:'🧍 Tubuh'},{kr:'입',meaning:'Mulut',cat:'🧍 Tubuh'},
+  {kr:'손',meaning:'Tangan',cat:'🧍 Tubuh'},{kr:'발',meaning:'Kaki',cat:'🧍 Tubuh'},
+  {kr:'배',meaning:'Perut',cat:'🧍 Tubuh'},{kr:'등',meaning:'Punggung',cat:'🧍 Tubuh'},
+  // Sapaan & Frasa
+  {kr:'안녕하세요',meaning:'Halo',cat:'💬 Sapaan'},{kr:'감사합니다',meaning:'Terima kasih',cat:'💬 Sapaan'},
+  {kr:'미안합니다',meaning:'Maaf',cat:'💬 Sapaan'},{kr:'네',meaning:'Ya',cat:'💬 Sapaan'},
+  {kr:'아니요',meaning:'Tidak',cat:'💬 Sapaan'},{kr:'안녕히 가세요',meaning:'Selamat jalan',cat:'💬 Sapaan'},
+  {kr:'잘 먹겠습니다',meaning:'Selamat makan',cat:'💬 Sapaan'},{kr:'반갑습니다',meaning:'Senang berkenalan',cat:'💬 Sapaan'},
+  {kr:'괜찮아요',meaning:'Tidak apa-apa',cat:'💬 Sapaan'},{kr:'잠깐만요',meaning:'Tunggu sebentar',cat:'💬 Sapaan'},
+  {kr:'얼마예요',meaning:'Berapa harganya?',cat:'💬 Sapaan'},{kr:'도와주세요',meaning:'Tolong bantu saya',cat:'💬 Sapaan'},
+  {kr:'어디예요',meaning:'Di mana?',cat:'💬 Sapaan'},{kr:'뭐예요',meaning:'Apa ini?',cat:'💬 Sapaan'}
 ];
 
 // ========== RENDER ALPHABET ==========
@@ -1065,20 +1163,22 @@ function showDetail(char) {
 function closeDetail() { document.getElementById('detailPanel').classList.remove('active'); }
 
 // ========== SYLLABLE BUILDER ==========
-let builderState = {consonant:'',vowel:'',activeSlot:'C'};
+let builderState = {consonant:'',vowel:'',final:'',activeSlot:'C'};
 const allConsonants = [...HANGUL.consonants,...HANGUL.doubleConsonants];
 const allVowels = [...HANGUL.vowels,...HANGUL.comboVowels];
 const INITIALS = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
 const MEDIALS = ['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅘ','ㅙ','ㅚ','ㅛ','ㅜ','ㅝ','ㅞ','ㅟ','ㅠ','ㅡ','ㅢ','ㅣ'];
+const FINALS_LIST = ['','ㄱ','ㄲ','ㄳ','ㄴ','ㄵ','ㄶ','ㄷ','ㄹ','ㄺ','ㄻ','ㄼ','ㄽ','ㄾ','ㄿ','ㅀ','ㅁ','ㅂ','ㅄ','ㅅ','ㅆ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
 function getInitialIndex(c){return INITIALS.indexOf(c)}
 function getMedialIndex(c){return MEDIALS.indexOf(c)}
+function getFinalIndex(c){return FINALS_LIST.indexOf(c)}
 
 function renderPicker() {
   const grid = document.getElementById('pickerGrid');
   const title = document.getElementById('pickerTitle');
   grid.innerHTML = '';
   if (builderState.activeSlot === 'C') {
-    title.textContent = 'Pilih Konsonan';
+    title.textContent = 'Pilih Konsonan Awal (초성)';
     allConsonants.forEach(c => {
       const cell = document.createElement('div');
       cell.className = 'picker-cell' + (builderState.consonant===c.char?' selected':'');
@@ -1086,13 +1186,28 @@ function renderPicker() {
       cell.onclick = () => selectConsonant(c.char);
       grid.appendChild(cell);
     });
-  } else {
-    title.textContent = 'Pilih Vokal';
+  } else if (builderState.activeSlot === 'V') {
+    title.textContent = 'Pilih Vokal (중성)';
     allVowels.forEach(v => {
       const cell = document.createElement('div');
       cell.className = 'picker-cell vowel-pick' + (builderState.vowel===v.char?' selected':'');
       cell.textContent = v.char;
       cell.onclick = () => selectVowel(v.char);
+      grid.appendChild(cell);
+    });
+  } else {
+    title.textContent = 'Pilih Konsonan Akhir (종성) — Opsional';
+    const emptyCell = document.createElement('div');
+    emptyCell.className = 'picker-cell' + (builderState.final===''?' selected':'');
+    emptyCell.textContent = '∅';
+    emptyCell.style.opacity = '0.5';
+    emptyCell.onclick = () => selectFinal('');
+    grid.appendChild(emptyCell);
+    allConsonants.forEach(c => {
+      const cell = document.createElement('div');
+      cell.className = 'picker-cell' + (builderState.final===c.char?' selected':'');
+      cell.textContent = c.char;
+      cell.onclick = () => selectFinal(c.char);
       grid.appendChild(cell);
     });
   }
@@ -1101,6 +1216,7 @@ function activateSlot(s) {
   builderState.activeSlot = s;
   document.getElementById('slotC').classList.toggle('active', s==='C');
   document.getElementById('slotV').classList.toggle('active', s==='V');
+  document.getElementById('slotF').classList.toggle('active', s==='F');
   renderPicker();
 }
 function selectConsonant(char) {
@@ -1116,26 +1232,39 @@ function selectVowel(char) {
   builderState.vowel = char;
   document.getElementById('slotVVal').textContent = char;
   document.getElementById('slotV').classList.add('filled');
+  builderState.activeSlot = 'F';
+  document.getElementById('slotV').classList.remove('active');
+  document.getElementById('slotF').classList.add('active');
   updatePreview(); renderPicker();
+}
+function selectFinal(char) {
+  builderState.final = char;
+  document.getElementById('slotFVal').textContent = char || '∅';
+  if (char) document.getElementById('slotF').classList.add('filled');
+  else document.getElementById('slotF').classList.remove('filled');
+  updatePreview();
 }
 function updatePreview() {
   const preview = document.getElementById('builderPreview');
   if (builderState.consonant && builderState.vowel) {
-    const ci = getInitialIndex(builderState.consonant), mi = getMedialIndex(builderState.vowel);
-    if (ci>=0 && mi>=0) {
-      preview.textContent = String.fromCharCode(0xAC00 + ci*588 + mi*28);
+    const ci = getInitialIndex(builderState.consonant), mi = getMedialIndex(builderState.vowel), fi = getFinalIndex(builderState.final);
+    if (ci>=0 && mi>=0 && fi>=0) {
+      preview.textContent = String.fromCharCode(0xAC00 + ci*588 + mi*28 + fi);
       preview.classList.add('has-value');
     }
   } else { preview.textContent = '?'; preview.classList.remove('has-value'); }
 }
 function clearBuilder() {
-  builderState = {consonant:'',vowel:'',activeSlot:'C'};
+  builderState = {consonant:'',vowel:'',final:'',activeSlot:'C'};
   document.getElementById('slotCVal').textContent = '';
   document.getElementById('slotVVal').textContent = '';
+  document.getElementById('slotFVal').textContent = '';
   document.getElementById('slotC').classList.remove('filled');
   document.getElementById('slotV').classList.remove('filled');
+  document.getElementById('slotF').classList.remove('filled');
   document.getElementById('slotC').classList.add('active');
   document.getElementById('slotV').classList.remove('active');
+  document.getElementById('slotF').classList.remove('active');
   document.getElementById('builderPreview').textContent = '?';
   document.getElementById('builderPreview').classList.remove('has-value');
   renderPicker();
@@ -1203,6 +1332,118 @@ const BREAKDOWN_WORDS = [
   {kr:'가방',roman:'gabang',meaning:'Tas',guide:[
     {syl:'가',parts:'ㄱ+ㅏ',explain:'ㄱ="g" + ㅏ="a" → "ga"'},
     {syl:'방',parts:'ㅂ+ㅏ+ㅇ',explain:'ㅂ="b" + ㅏ="a" + ㅇ="ng" → "bang"'}
+  ]},
+  {kr:'미안합니다',roman:'mianhamnida',meaning:'Maaf',guide:[
+    {syl:'미',parts:'ㅁ+ㅣ',explain:'ㅁ="m" + ㅣ="i" → "mi"'},
+    {syl:'안',parts:'ㅇ+ㅏ+ㄴ',explain:'ㅇ diam + ㅏ="a" + ㄴ="n" → "an"'},
+    {syl:'합',parts:'ㅎ+ㅏ+ㅂ',explain:'ㅎ="h" + ㅏ="a" + ㅂ="p" → "hap"'},
+    {syl:'니',parts:'ㄴ+ㅣ',explain:'ㄴ="n" + ㅣ="i" → "ni"'},
+    {syl:'다',parts:'ㄷ+ㅏ',explain:'ㄷ="d" + ㅏ="a" → "da"'}
+  ]},
+  {kr:'먹습니다',roman:'meokseumnida',meaning:'(Saya) makan',guide:[
+    {syl:'먹',parts:'ㅁ+ㅓ+ㄱ',explain:'ㅁ="m" + ㅓ="eo" + ㄱ="k" → "meok"'},
+    {syl:'습',parts:'ㅅ+ㅡ+ㅂ',explain:'ㅅ="s" + ㅡ="eu" + ㅂ="p" → "seup"'},
+    {syl:'니',parts:'ㄴ+ㅣ',explain:'ㄴ="n" + ㅣ="i" → "ni"'},
+    {syl:'다',parts:'ㄷ+ㅏ',explain:'ㄷ="d" + ㅏ="a" → "da"'}
+  ]},
+  {kr:'좋아요',roman:'joayo',meaning:'Bagus/suka',guide:[
+    {syl:'좋',parts:'ㅈ+ㅗ+ㅎ',explain:'ㅈ="j" + ㅗ="o" + ㅎ="h" → "joh"'},
+    {syl:'아',parts:'ㅇ+ㅏ',explain:'ㅇ diam + ㅏ="a" → "a"'},
+    {syl:'요',parts:'ㅛ',explain:'ㅛ="yo"'}
+  ]},
+  {kr:'고맙습니다',roman:'gomapseumnida',meaning:'Terima kasih (formal)',guide:[
+    {syl:'고',parts:'ㄱ+ㅗ',explain:'ㄱ="g" + ㅗ="o" → "go"'},
+    {syl:'맙',parts:'ㅁ+ㅏ+ㅂ',explain:'ㅁ="m" + ㅏ="a" + ㅂ="p" → "map"'},
+    {syl:'습',parts:'ㅅ+ㅡ+ㅂ',explain:'ㅅ="s" + ㅡ="eu" + ㅂ="p" → "seup"'},
+    {syl:'니',parts:'ㄴ+ㅣ',explain:'ㄴ="n" + ㅣ="i" → "ni"'},
+    {syl:'다',parts:'ㄷ+ㅏ',explain:'ㄷ="d" + ㅏ="a" → "da"'}
+  ]},
+  {kr:'가겠습니다',roman:'gagessseumnida',meaning:'Akan pergi',guide:[
+    {syl:'가',parts:'ㄱ+ㅏ',explain:'ㄱ="g" + ㅏ="a" → "ga"'},
+    {syl:'겠',parts:'ㄱ+ㅔ+ㅅ',explain:'ㄱ="g" + ㅔ="e" + ㅅ="s" → "ges"'},
+    {syl:'습',parts:'ㅅ+ㅡ+ㅂ',explain:'ㅅ="s" + ㅡ="eu" + ㅂ="p" → "seup"'},
+    {syl:'니',parts:'ㄴ+ㅣ',explain:'ㄴ="n" + ㅣ="i" → "ni"'},
+    {syl:'다',parts:'ㄷ+ㅏ',explain:'ㄷ="d" + ㅏ="a" → "da"'}
+  ]},
+  {kr:'만나서 반갑습니다',roman:'mannaseo bangapseumnida',meaning:'Senang berkenalan',guide:[
+    {syl:'만',parts:'ㅁ+ㅏ+ㄴ',explain:'ㅁ="m" + ㅏ="a" + ㄴ="n" → "man"'},
+    {syl:'나',parts:'ㄴ+ㅏ',explain:'ㄴ="n" + ㅏ="a" → "na"'},
+    {syl:'서',parts:'ㅅ+ㅓ',explain:'ㅅ="s" + ㅓ="eo" → "seo"'},
+    {syl:'반',parts:'ㅂ+ㅏ+ㄴ',explain:'ㅂ="b" + ㅏ="a" + ㄴ="n" → "ban"'},
+    {syl:'갑',parts:'ㄱ+ㅏ+ㅂ',explain:'ㄱ="g" + ㅏ="a" + ㅂ="p" → "gap"'},
+    {syl:'습',parts:'ㅅ+ㅡ+ㅂ',explain:'ㅅ="s" + ㅡ="eu" + ㅂ="p" → "seup"'},
+    {syl:'니',parts:'ㄴ+ㅣ',explain:'ㄴ="n" + ㅣ="i" → "ni"'},
+    {syl:'다',parts:'ㄷ+ㅏ',explain:'ㄷ="d" + ㅏ="a" → "da"'}
+  ]},
+  {kr:'한국어를 배우고 싶어요',roman:'hangugeo-reul baeugo sipeoyo',meaning:'Saya ingin belajar bahasa Korea',guide:[
+    {syl:'한',parts:'ㅎ+ㅏ+ㄴ',explain:'ㅎ="h" + ㅏ="a" + ㄴ="n" → "han"'},
+    {syl:'국',parts:'ㄱ+ㅜ+ㄱ',explain:'ㄱ="g" + ㅜ="u" + ㄱ="k" → "guk"'},
+    {syl:'어',parts:'ㅇ+ㅓ',explain:'ㅇ diam + ㅓ="eo" → "eo"'},
+    {syl:'를',parts:'ㄹ+ㅡ+ㄹ',explain:'ㄹ="r" + ㅡ="eu" + ㄹ="l" → "reul"'},
+    {syl:'배',parts:'ㅂ+ㅐ',explain:'ㅂ="b" + ㅐ="ae" → "bae"'},
+    {syl:'우',parts:'ㅇ+ㅜ',explain:'ㅇ diam + ㅜ="u" → "u"'},
+    {syl:'고',parts:'ㄱ+ㅗ',explain:'ㄱ="g" + ㅗ="o" → "go"'},
+    {syl:'시',parts:'ㅅ+ㅣ',explain:'ㅅ="s" + ㅣ="i" → "si"'},
+    {syl:'펴',parts:'ㅍ+ㅕ',explain:'ㅍ="p" + ㅕ="yeo" → "pyeo"'},
+    {syl:'요',parts:'ㅛ',explain:'ㅛ="yo"'}
+  ]},
+  {kr:'어디에 있어요',roman:'eodie isseoyo',meaning:'Di mana?',guide:[
+    {syl:'어',parts:'ㅇ+ㅓ',explain:'ㅇ diam + ㅓ="eo" → "eo"'},
+    {syl:'디',parts:'ㄷ+ㅣ',explain:'ㄷ="d" + ㅣ="i" → "di"'},
+    {syl:'에',parts:'ㅇ+ㅔ',explain:'ㅇ diam + ㅔ="e" → "e"'},
+    {syl:'있',parts:'ㅇ+ㅣ+ㅅ',explain:'ㅇ diam + ㅣ="i" + ㅅ="s" → "is"'},
+    {syl:'어',parts:'ㅇ+ㅓ',explain:'ㅇ diam + ㅓ="eo" → "eo"'},
+    {syl:'요',parts:'ㅛ',explain:'ㅛ="yo"'}
+  ]},
+  {kr:'얼마예요',roman:'eolmayeyo',meaning:'Berapa harganya?',guide:[
+    {syl:'얼',parts:'ㅇ+ㅓ+ㄹ',explain:'ㅇ diam + ㅓ="eo" + ㄹ="l" → "eol"'},
+    {syl:'마',parts:'ㅁ+ㅏ',explain:'ㅁ="m" + ㅏ="a" → "ma"'},
+    {syl:'예',parts:'ㅇ+ㅖ',explain:'ㅇ diam + ㅖ="ye" → "ye"'},
+    {syl:'요',parts:'ㅛ',explain:'ㅛ="yo"'}
+  ]},
+  {kr:'물 주세요',roman:'mul juseyo',meaning:'Tolong beri air',guide:[
+    {syl:'물',parts:'ㅁ+ㅜ+ㄹ',explain:'ㅁ="m" + ㅜ="u" + ㄹ="l" → "mul"'},
+    {syl:'주',parts:'ㅈ+ㅜ',explain:'ㅈ="j" + ㅜ="u" → "ju"'},
+    {syl:'세',parts:'ㅅ+ㅔ',explain:'ㅅ="s" + ㅔ="e" → "se"'},
+    {syl:'요',parts:'ㅛ',explain:'ㅛ="yo"'}
+  ]},
+  {kr:'화장실 어디예요',roman:'hwajangsil eodiyeyo',meaning:'Di mana toilet?',guide:[
+    {syl:'화',parts:'ㅎ+ㅘ',explain:'ㅎ="h" + ㅘ="wa" → "hwa"'},
+    {syl:'장',parts:'ㅈ+ㅏ+ㅇ',explain:'ㅈ="j" + ㅏ="a" + ㅇ="ng" → "jang"'},
+    {syl:'실',parts:'ㅅ+ㅣ+ㄹ',explain:'ㅅ="s" + ㅣ="i" + ㄹ="l" → "sil"'},
+    {syl:'어',parts:'ㅇ+ㅓ',explain:'ㅇ diam + ㅓ="eo" → "eo"'},
+    {syl:'디',parts:'ㄷ+ㅣ',explain:'ㄷ="d" + ㅣ="i" → "di"'},
+    {syl:'예',parts:'ㅇ+ㅖ',explain:'ㅇ diam + ㅖ="ye" → "ye"'},
+    {syl:'요',parts:'ㅛ',explain:'ㅛ="yo"'}
+  ]},
+  {kr:'오늘 날씨가 좋아요',roman:'oneul nalssiga joayo',meaning:'Cuaca hari ini bagus',guide:[
+    {syl:'오',parts:'ㅇ+ㅗ',explain:'ㅇ diam + ㅗ="o" → "o"'},
+    {syl:'늘',parts:'ㄴ+ㅡ+ㄹ',explain:'ㄴ="n" + ㅡ="eu" + ㄹ="l" → "neul"'},
+    {syl:'날',parts:'ㄴ+ㅏ+ㄹ',explain:'ㄴ="n" + ㅏ="a" + ㄹ="l" → "nal"'},
+    {syl:'씨',parts:'ㅆ+ㅣ',explain:'ㅆ="ss" + ㅣ="i" → "ssi"'},
+    {syl:'가',parts:'ㄱ+ㅏ',explain:'ㄱ="g" + ㅏ="a" → "ga"'},
+    {syl:'좋',parts:'ㅈ+ㅗ+ㅎ',explain:'ㅈ="j" + ㅗ="o" + ㅎ="h" → "joh"'},
+    {syl:'아',parts:'ㅇ+ㅏ',explain:'ㅇ diam + ㅏ="a" → "a"'},
+    {syl:'요',parts:'ㅛ',explain:'ㅛ="yo"'}
+  ]},
+  {kr:'배고파요',roman:'baegopayo',meaning:'Lapar',guide:[
+    {syl:'배',parts:'ㅂ+ㅐ',explain:'ㅂ="b" + ㅐ="ae" → "bae"'},
+    {syl:'고',parts:'ㄱ+ㅗ',explain:'ㄱ="g" + ㅗ="o" → "go"'},
+    {syl:'파',parts:'ㅍ+ㅏ',explain:'ㅍ="p" + ㅏ="a" → "pa"'},
+    {syl:'요',parts:'ㅛ',explain:'ㅛ="yo"'}
+  ]},
+  {kr:'피곤해요',roman:'pigonhaeyo',meaning:'Lelah',guide:[
+    {syl:'피',parts:'ㅍ+ㅣ',explain:'ㅍ="p" + ㅣ="i" → "pi"'},
+    {syl:'곤',parts:'ㄱ+ㅗ+ㄴ',explain:'ㄱ="g" + ㅗ="o" + ㄴ="n" → "gon"'},
+    {syl:'해',parts:'ㅎ+ㅐ',explain:'ㅎ="h" + ㅐ="ae" → "hae"'},
+    {syl:'요',parts:'ㅛ',explain:'ㅛ="yo"'}
+  ]},
+  {kr:'행복하세요',roman:'haengbokhaseyo',meaning:'Semoga bahagia',guide:[
+    {syl:'행',parts:'ㅎ+ㅐ+ㅇ',explain:'ㅎ="h" + ㅐ="ae" + ㅇ="ng" → "haeng"'},
+    {syl:'복',parts:'ㅂ+ㅗ+ㄱ',explain:'ㅂ="b" + ㅗ="o" + ㄱ="k" → "bok"'},
+    {syl:'하',parts:'ㅎ+ㅏ',explain:'ㅎ="h" + ㅏ="a" → "ha"'},
+    {syl:'세',parts:'ㅅ+ㅔ',explain:'ㅅ="s" + ㅔ="e" → "se"'},
+    {syl:'요',parts:'ㅛ',explain:'ㅛ="yo"'}
   ]}
 ];
 
@@ -1435,12 +1676,151 @@ function retryLevel(){startLevel(quizState.currentLevel.id);}
 function backToLevels(){document.getElementById('quizLevelSelect').style.display='block';document.getElementById('quizActive').style.display='none';document.getElementById('quizComplete').style.display='none';renderLevels();}
 renderLevels();
 
-// ========== KEYBOARD ==========
+// ========== KEYBOARD (Hangul Composition Engine) ==========
 const KB_ROWS = [
   ['ㅂ','ㅈ','ㄷ','ㄱ','ㅅ','ㅛ','ㅕ','ㅑ','ㅐ','ㅔ'],
   ['ㅁ','ㄴ','ㅇ','ㄹ','ㅎ','ㅗ','ㅓ','ㅏ','ㅣ'],
   ['ㅋ','ㅌ','ㅊ','ㅍ','ㅠ','ㅜ','ㅡ']
 ];
+const VOWELS = new Set(['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅘ','ㅙ','ㅚ','ㅛ','ㅜ','ㅝ','ㅞ','ㅟ','ㅠ','ㅡ','ㅢ','ㅣ']);
+const CONSONANTS = new Set(['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ']);
+
+// Compound vowel mappings: second char → combined vowel
+const VOWEL_COMBO = {
+  'ㅏ':{'ㅗ':'ㅘ','ㅜ':'ㅝ'},
+  'ㅐ':{'ㅗ':'ㅙ','ㅜ':'ㅞ'},
+  'ㅔ':{'ㅗ':'ㅚ','ㅜ':'ㅟ'},
+  'ㅣ':{'ㅡ':'ㅢ'}
+};
+
+// Compound final consonant mappings
+const FINAL_COMBO = {
+  'ㄱ':{'ㄱ':'ㄲ','ㅅ':'ㄳ'},
+  'ㄴ':{'ㅈ':'ㄵ','ㅎ':'ㄶ'},
+  'ㄹ':{'ㄱ':'ㄺ','ㅁ':'ㄻ','ㅂ':'ㄼ','ㅅ':'ㄽ','ㅌ':'ㄾ','ㅍ':'ㄿ','ㅎ':'ㅀ'},
+  'ㅂ':{'ㅅ':'ㅄ'},
+  'ㅅ':{'ㅅ':'ㅆ'}
+};
+
+// Hangul composition constants
+const HI = 0x1100, HM = 0x1161, HF = 0x11A7, SYL = 0xAC00;
+const INIT_TO_JAMO = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+const MED_TO_JAMO = ['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅘ','ㅙ','ㅚ','ㅛ','ㅜ','ㅝ','ㅞ','ㅟ','ㅠ','ㅡ','ㅢ','ㅣ'];
+const FIN_TO_JAMO = ['','ㄱ','ㄲ','ㄳ','ㄴ','ㄵ','ㄶ','ㄷ','ㄹ','ㄺ','ㄻ','ㄼ','ㄽ','ㄾ','ㄿ','ㅀ','ㅁ','ㅂ','ㅄ','ㅅ','ㅆ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+const JAMO_TO_INIT = {}; INIT_TO_JAMO.forEach((j,i)=>JAMO_TO_INIT[j]=i);
+const JAMO_TO_MED = {}; MED_TO_JAMO.forEach((j,i)=>JAMO_TO_MED[j]=i);
+const JAMO_TO_FIN = {}; FIN_TO_JAMO.forEach((j,i)=>{if(i>0)JAMO_TO_FIN[j]=i;});
+
+// Keyboard composition state
+let kbComposed = ''; // committed text (syllable blocks)
+let kbInit = null, kbMed = null, kbFin = null; // current syllable parts
+
+function kbComposeChar(init, med, fin) {
+  const ii = JAMO_TO_INIT[init], mi = JAMO_TO_MED[med];
+  if (ii === undefined || mi === undefined) return null;
+  const fi = fin ? (JAMO_TO_FIN[fin] || 0) : 0;
+  return String.fromCharCode(SYL + ii*588 + mi*28 + fi);
+}
+
+function kbFlush() {
+  if (kbInit && kbMed) {
+    kbComposed += kbComposeChar(kbInit, kbMed, kbFin);
+  } else if (kbInit) {
+    kbComposed += kbInit;
+  }
+  kbInit = null; kbMed = null; kbFin = null;
+}
+
+function kbGetDisplay() {
+  let display = kbComposed;
+  if (kbInit && kbMed) {
+    display += kbComposeChar(kbInit, kbMed, kbFin);
+  } else if (kbInit) {
+    display += kbInit;
+  }
+  return display;
+}
+
+function kbType(k) {
+  // Vowel input
+  if (VOWELS.has(k)) {
+    if (kbInit === null) {
+      // No initial yet - just show the vowel as standalone
+      kbComposed += k;
+    } else if (kbMed === null) {
+      // Set medial
+      kbMed = k;
+    } else if (kbFin) {
+      // If we have final + vowel → final moves to new initial, vowel is new medial
+      // Check for compound vowel first
+      if (VOWEL_COMBO[kbMed] && VOWEL_COMBO[kbMed][k]) {
+        kbMed = VOWEL_COMBO[kbMed][k];
+      } else {
+        const oldFin = kbFin;
+        kbFin = null;
+        kbFlush();
+        kbInit = oldFin;
+        kbMed = k;
+      }
+    } else {
+      // No final, just medial + new vowel → check compound vowel
+      if (VOWEL_COMBO[kbMed] && VOWEL_COMBO[kbMed][k]) {
+        kbMed = VOWEL_COMBO[kbMed][k];
+      } else {
+        kbFlush();
+        kbComposed += k;
+      }
+    }
+  }
+  // Consonant input
+  else if (CONSONANTS.has(k)) {
+    if (kbInit === null) {
+      kbInit = k;
+    } else if (kbMed === null) {
+      // Already have initial but no medial → flush old, start new
+      kbFlush();
+      kbInit = k;
+    } else if (kbFin === null) {
+      // Have initial+medial → set final
+      kbFin = k;
+    } else {
+      // Have initial+medial+final → check compound final
+      if (FINAL_COMBO[kbFin] && FINAL_COMBO[kbFin][k]) {
+        kbFin = FINAL_COMBO[kbFin][k];
+      } else {
+        // Can't combine → flush, start new syllable
+        kbFlush();
+        kbInit = k;
+      }
+    }
+  }
+  // Other characters (space, punctuation)
+  else {
+    kbFlush();
+    kbComposed += k;
+  }
+  document.getElementById('kbOutput').textContent = kbGetDisplay();
+}
+
+function kbBackspace() {
+  if (kbFin) { kbFin = null; }
+  else if (kbMed) { kbMed = null; }
+  else if (kbInit) { kbInit = null; }
+  else { kbComposed = kbComposed.slice(0, -1); }
+  document.getElementById('kbOutput').textContent = kbGetDisplay();
+}
+
+function kbClear() {
+  kbComposed = ''; kbInit = null; kbMed = null; kbFin = null;
+  document.getElementById('kbOutput').textContent = '';
+}
+
+function kbSpeak() {
+  kbFlush();
+  const text = kbGetDisplay();
+  if (text) speakKorean(text);
+}
+
 function renderKeyboard(){
   ['kbRow1','kbRow2','kbRow3'].forEach((rid,ri)=>{
     const row=document.getElementById(rid);row.innerHTML='';
@@ -1460,27 +1840,22 @@ function renderKeyboard(){
     row4.appendChild(key);
   });
 }
-let kbText='';
-function kbType(k){kbText+=k;document.getElementById('kbOutput').textContent=kbText;}
-function kbBackspace(){kbText=kbText.slice(0,-1);document.getElementById('kbOutput').textContent=kbText;}
-function kbClear(){kbText='';document.getElementById('kbOutput').textContent='';}
-function kbSpeak(){if(kbText)speakKorean(kbText);}
 renderKeyboard();
 
 // ========== PRONUNCIATION RULES ==========
 const PRON_RULES = [
-  {title:'🔄 ㄱ di depan ㄴ → jadi "ng"',desc:'Ketika ㄱ bertemu ㄴ di suku kata berikutnya, bunyi berubah menjadi "ng".',examples:[{before:'학년 → hak-nyeon',after:'학년 → hang-nyeon',note:'hak + nyeon → hangnyeon'}]},
-  {title:'🔄 ㅂ di depan ㄴ → jadi "m"',desc:'ㅂ berubah menjadi "m" jika diikuti ㄴ.',examples:[{before:'합니다 → hab-nida',after:'합니다 → ham-nida',note:'hab + nida → hamnida'}]},
-  {title:'🔄 ㄷ di depan ㄴ → jadi "n"',desc:'ㄷ berubah menjadi "n" jika diikuti ㄴ.',examples:[{before:'같은 → gat-eun',after:'같은 → gan-eun',note:'gat + eun → ganeun'}]},
-  {title:'🔄 ㅎ yang melemah/hilang',desc:'ㅎ sering hilang atau dilemahkan dalam percakapan cepat.',examples:[{before:'좋아요 → jo-ha-yo',after:'좋아요 → jo-a-yo',note:'ㅎ hampir tidak terdengar'}]},
-  {title:'🔄 Riaison (연음)',desc:'Konsonan akhir suku kata pertama pindah ke awal suku kata berikutnya jika dimulai vokal.',examples:[{before:'한국어 → han-guk-eo',after:'한국어 → han-gu-geo',note:'ㄱ dari 국 pindah ke 어'}]},
-  {title:'🔄 ㅅ di depan ㄴ → jadi "n"',desc:'ㅅ berubah menjadi "n" jika diikuti ㄴ.',examples:[{before:'있는 → iss-neun',after:'있는 → in-neun',note:'iss + neun → inneun'}]}
+  {title:'🔄 ㄱ di depan ㄴ → jadi "ng"',desc:'Ketika ㄱ bertemu ㄴ di suku kata berikutnya, bunyi berubah menjadi "ng".',kr:'학년',examples:[{before:'학년 → hak-nyeon',after:'학년 → hang-nyeon',note:'hak + nyeon → hangnyeon'}]},
+  {title:'🔄 ㅂ di depan ㄴ → jadi "m"',desc:'ㅂ berubah menjadi "m" jika diikuti ㄴ.',kr:'합니다',examples:[{before:'합니다 → hab-nida',after:'합니다 → ham-nida',note:'hab + nida → hamnida'}]},
+  {title:'🔄 ㄷ di depan ㄴ → jadi "n"',desc:'ㄷ berubah menjadi "n" jika diikuti ㄴ.',kr:'같은',examples:[{before:'같은 → gat-eun',after:'같은 → gan-eun',note:'gat + eun → ganeun'}]},
+  {title:'🔄 ㅎ yang melemah/hilang',desc:'ㅎ sering hilang atau dilemahkan dalam percakapan cepat.',kr:'좋아요',examples:[{before:'좋아요 → jo-ha-yo',after:'좋아요 → jo-a-yo',note:'ㅎ hampir tidak terdengar'}]},
+  {title:'🔄 Riaison (연음)',desc:'Konsonan akhir suku kata pertama pindah ke awal suku kata berikutnya jika dimulai vokal.',kr:'한국어',examples:[{before:'한국어 → han-guk-eo',after:'한국어 → han-gu-geo',note:'ㄱ dari 국 pindah ke 어'}]},
+  {title:'🔄 ㅅ di depan ㄴ → jadi "n"',desc:'ㅅ berubah menjadi "n" jika diikuti ㄴ.',kr:'있는',examples:[{before:'있는 → iss-neun',after:'있는 → in-neun',note:'iss + neun → inneun'}]}
 ];
 function renderPronRules(){
   const c=document.getElementById('pronunciationRules');c.innerHTML='';
   PRON_RULES.forEach(r=>{
     const card=document.createElement('div');card.className='rule-card';
-    card.innerHTML=`<h3>${r.title}</h3><p>${r.desc}</p>${r.examples.map(ex=>`<div class="rule-example"><span class="before">${ex.before}</span><span class="arrow">→</span><span class="after">${ex.after}</span><span style="color:var(--text-sub);font-size:0.75rem;margin-left:auto">${ex.note}</span></div>`).join('')}`;
+    card.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem"><h3 style="flex:1">${r.title}</h3>${r.kr?`<button class="btn-sm primary" onclick="speakKorean('${r.kr}')" style="white-space:nowrap">🔊 Dengar</button>`:''}</div><p>${r.desc}</p>${r.examples.map(ex=>`<div class="rule-example"><span class="before">${ex.before}</span><span class="arrow">→</span><span class="after">${ex.after}</span><span style="color:var(--text-sub);font-size:0.75rem;margin-left:auto">${ex.note}</span></div>`).join('')}`;
     c.appendChild(card);
   });
 }
@@ -1830,39 +2205,6 @@ function renderWriteSelector(){
 renderWriteSelector();
 selectWriteChar(0);
 setTimeout(initCanvas, 100);
-
-// ========== AUDIO FOR PRONUNCIATION RULES ==========
-const originalRenderPronRules = renderPronRules;
-renderPronRules = function(){
-  const c=document.getElementById('pronunciationRules');c.innerHTML='';
-  PRON_RULES.forEach(r=>{
-    const card=document.createElement('div');card.className='rule-card';
-    const exHTML = r.examples.map(ex=>`
-      <div class="rule-example">
-        <span class="before">${ex.before}</span>
-        <span class="arrow">→</span>
-        <span class="after">${ex.after}</span>
-        <span style="color:var(--text-sub);font-size:0.75rem;margin-left:auto">${ex.note}</span>
-        <button class="pron-play" style="margin-left:0.5rem" onclick="speakRuleExample(this,${JSON.stringify(ex.before.split('→')[0].trim().split(' ')[0])},${JSON.stringify(ex.after.split('→')[1].trim().split(' ')[0])})">🔊</button>
-      </div>
-    `).join('');
-    card.innerHTML=`<h3>${r.title}</h3><p>${r.desc}</p>${exHTML}`;
-    c.appendChild(card);
-  });
-};
-renderPronRules();
-
-function speakRuleExample(btn, wrong, correct){
-  document.querySelectorAll('.pron-play').forEach(b=>b.classList.remove('playing'));
-  btn.classList.add('playing');
-  if(!('speechSynthesis' in window))return;
-  speechSynthesis.cancel();
-  // Speak wrong version then correct
-  const u1 = new SpeechSynthesisUtterance(wrong);
-  u1.lang='ko-KR';u1.rate=0.7;
-  const u2 = new SpeechSynthesisUtterance(correct);
-  u2.lang='ko-KR';u2.rate=0.7;
-  u2.onend=()=>btn.classList.remove('playing');
   u1.onend=()=>speechSynthesis.speak(u2);
   speechSynthesis.speak(u1);
 }
